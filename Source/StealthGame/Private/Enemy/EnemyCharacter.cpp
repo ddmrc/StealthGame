@@ -31,10 +31,18 @@ void AEnemyCharacter::Tick(float DeltaTime)
 
 	if (FindComponentByClass<UPawnSensingComponent>()->CouldSeePawn(PlayerCharacter))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Found"));
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(1, 15.0f, FColor::Red, TEXT("Player Detected!"));
+		}
+
 	}
 	else
-		UE_LOG(LogTemp, Warning, TEXT("Hidden"));
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(1, 1.0f, FColor::Yellow, TEXT("Player Hidden!"));
+		}
+
 
 
 

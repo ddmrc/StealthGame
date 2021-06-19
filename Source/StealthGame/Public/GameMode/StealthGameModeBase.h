@@ -4,14 +4,35 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "Props/FinishLine.h"
 #include "StealthGameModeBase.generated.h"
 
 /**
  * 
  */
+
+UENUM()
+enum class EGamePlayState
+{
+	EPlaying,
+	EPlayerLost,
+	EPlayerWon,
+};
 UCLASS()
 class STEALTHGAME_API AStealthGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+public:
+
+	virtual void BeginPlay() override;
+	AFinishLine* FinishLine = nullptr;
+
+protected:
+
+	void SetNewState(EGamePlayState NewState);
+	UFUNCTION()
+	void PlayerWinsGame();
+
+
+
 };
