@@ -75,7 +75,7 @@ void AMyPlayerCharacter::LookSide(float AxisVal)
 
 void AMyPlayerCharacter::PlayerCrouch()
 {
-	UE_LOG(LogTemp, Warning, TEXT("CROUCH"));
+
 	 Crouch(false);
 	 
 }

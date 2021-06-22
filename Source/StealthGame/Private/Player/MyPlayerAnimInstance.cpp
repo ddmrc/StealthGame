@@ -16,6 +16,7 @@ bool UMyPlayerAnimInstance::IsPlayerCrouching()
 {
 	if (PlayerCharacter)
 	{
+		UE_LOG(LogTemp,Warning,TEXT("%s"),PlayerCharacter->GetMovementComponent()->IsCrouching()? "true":"false");
 		return PlayerCharacter->GetMovementComponent()->IsCrouching();
 	}
 	else
@@ -24,6 +25,12 @@ bool UMyPlayerAnimInstance::IsPlayerCrouching()
 
 float UMyPlayerAnimInstance::GetFrontAxisValue()
 {
+
+
+
+
+
+
 	if (PlayerCharacter)
 	{
 		
@@ -88,3 +95,20 @@ float UMyPlayerAnimInstance::GetSideAxisValue()
 	return m_SideAxisValue;
 }
 
+
+bool UMyPlayerAnimInstance::IsPlayerMoving()
+{
+	if (PlayerCharacter)
+	{
+		if (PlayerCharacter->SideAxisValue != 0 || PlayerCharacter->FrontAxisValue != 0)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	return false;
+}

@@ -27,8 +27,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsPlayerCrouching();
 	UFUNCTION(BlueprintCallable)
+	bool IsPlayerMoving();
+	UFUNCTION(BlueprintCallable)
 	float GetFrontAxisValue();	
 	UFUNCTION(BlueprintCallable)
 	float GetSideAxisValue();
+
 	
 };
