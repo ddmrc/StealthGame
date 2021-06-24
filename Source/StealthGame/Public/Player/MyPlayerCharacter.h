@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Perception/AISightTargetInterface.h"
 #include "MyPlayerCharacter.generated.h"
 
 UCLASS()
-class STEALTHGAME_API AMyPlayerCharacter : public ACharacter
+class STEALTHGAME_API AMyPlayerCharacter : public ACharacter, public IAISightTargetInterface
 {
 	GENERATED_BODY()
 
@@ -25,6 +26,9 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	//Called to determine where AI can detect player
+	virtual bool CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation,
+		int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor) const override;
 
 	void MoveForward(float AxisVal);
 	void MoveSideways(float AxisVal);
@@ -33,6 +37,8 @@ public:
 
 	void PlayerCrouch();
 	void PlayerUnCrouch();
+
+
 
 
 	/** Base lookup rate, in deg/sec. Other scaling may affect final lookup rate. */

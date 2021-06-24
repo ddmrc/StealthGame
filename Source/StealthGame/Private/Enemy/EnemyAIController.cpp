@@ -2,12 +2,19 @@
 
 
 #include "Enemy/EnemyAIController.h"
+#include "Kismet/GameplayStatics.h"
 #include "Perception/AIPerceptionComponent.h"
 
 void AEnemyAIController::BeginPlay()
 {
 
 	Super::BeginPlay();
+
+
+	if (PlayerCharacter == nullptr)
+	{
+		PlayerCharacter = Cast<AMyPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	}
 
 
 	if (UAIPerceptionComponent* ThisPerceptionComponent = GetPerceptionComponent())
@@ -38,3 +45,4 @@ void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stim
 	}
 
 }
+

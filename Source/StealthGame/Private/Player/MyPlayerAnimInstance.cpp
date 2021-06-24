@@ -16,7 +16,7 @@ bool UMyPlayerAnimInstance::IsPlayerCrouching()
 {
 	if (PlayerCharacter)
 	{
-		UE_LOG(LogTemp,Warning,TEXT("%s"),PlayerCharacter->GetMovementComponent()->IsCrouching()? "true":"false");
+		//UE_LOG(LogTemp,Warning,TEXT("%s"),PlayerCharacter->GetMovementComponent()->IsCrouching()? "true":"false");
 		return PlayerCharacter->GetMovementComponent()->IsCrouching();
 	}
 	else

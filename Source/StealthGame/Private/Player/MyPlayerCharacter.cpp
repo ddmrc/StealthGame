@@ -3,6 +3,7 @@
 
 #include "Player/MyPlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -18,6 +19,7 @@ void AMyPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+	
 	
 	
 }
@@ -82,4 +84,37 @@ void AMyPlayerCharacter::PlayerCrouch()
 void AMyPlayerCharacter::PlayerUnCrouch()
 {
 	UnCrouch();
+}
+
+bool AMyPlayerCharacter::CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation,
+	int32& NumberOfLoSChecksPerformed, float& OutSightStrength, const AActor* IgnoreActor) const
+{
+
+	static const FName AILineOfSight = FName(TEXT("TestPawnLineOfSight"));
+
+	FHitResult HitResult;
+
+	auto sockets = GetMesh()->GetAllSocketNames();
+
+	for (int i = 0; i < sockets.Num(); i++)
+	{
+		FVector socketLocation = GetMesh()->GetSocketLocation(sockets[i]);
+
+		const bool bHitSocket = GetWorld()->LineTraceSingleByObjectType(HitResult, ObserverLocation, socketLocation
+			, FCollisionObjectQueryParams(ECollisionChannel::ECC_WorldStatic || ECollisionChannel::ECC_WorldDynamic)
+			, FCollisionQueryParams(AILineOfSight, true, IgnoreActor));
+
+		NumberOfLoSChecksPerformed++;
+
+		if (bHitSocket == false || (HitResult.Actor.IsValid() && HitResult.Actor->IsOwnedBy(this))) {
+			OutSeenLocation = GetMesh()->GetSocketLocation(FName(TEXT("spine_02")));
+			OutSightStrength = 1;
+
+			return true;
+		}
+	}
+
+
+	OutSightStrength = 0;
+	return false;
 }
