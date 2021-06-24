@@ -94,11 +94,10 @@ bool AMyPlayerCharacter::CanBeSeenFrom(const FVector& ObserverLocation, FVector&
 
 	FHitResult HitResult;
 
-	auto sockets = GetMesh()->GetAllSocketNames();
+	
 
-	for (int i = 0; i < sockets.Num(); i++)
-	{
-		FVector socketLocation = GetMesh()->GetSocketLocation(sockets[i]);
+	
+		FVector socketLocation = GetMesh()->GetSocketLocation(FName(TEXT("head")));
 
 		const bool bHitSocket = GetWorld()->LineTraceSingleByObjectType(HitResult, ObserverLocation, socketLocation
 			, FCollisionObjectQueryParams(ECollisionChannel::ECC_WorldStatic || ECollisionChannel::ECC_WorldDynamic)
@@ -112,7 +111,7 @@ bool AMyPlayerCharacter::CanBeSeenFrom(const FVector& ObserverLocation, FVector&
 
 			return true;
 		}
-	}
+	
 
 
 	OutSightStrength = 0;

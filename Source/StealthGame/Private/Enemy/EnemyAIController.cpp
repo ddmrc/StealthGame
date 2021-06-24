@@ -43,6 +43,6 @@ void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stim
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player Undetected"));
 		}
 	}
-
+	
 }
 
