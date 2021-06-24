@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Player/MyPlayerCharacter.h"
 #include "EnemyCharacter.generated.h"
 
 UCLASS()
@@ -15,7 +14,7 @@ class STEALTHGAME_API AEnemyCharacter : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AEnemyCharacter();
-	AMyPlayerCharacter* PlayerCharacter = nullptr;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

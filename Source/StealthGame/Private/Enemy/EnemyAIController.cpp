@@ -2,4 +2,39 @@
 
 
 #include "Enemy/EnemyAIController.h"
+#include "Perception/AIPerceptionComponent.h"
 
+void AEnemyAIController::BeginPlay()
+{
+
+	Super::BeginPlay();
+
+
+	if (UAIPerceptionComponent* ThisPerceptionComponent = GetPerceptionComponent())
+	{
+		ThisPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemyAIController::TargetPerceptionUpdated);
+
+	}
+
+}
+
+
+
+void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+{
+	if (Stimulus.WasSuccessfullySensed())
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Player Detected"));
+		}
+	}
+	else
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player Undetected"));
+		}
+	}
+
+}
