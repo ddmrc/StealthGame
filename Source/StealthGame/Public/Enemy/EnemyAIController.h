@@ -11,6 +11,17 @@
 /**
  * 
  */
+UENUM()
+enum class EAIStates : uint8
+{
+	Idle,
+	Detected,
+	Chasing,
+	Searching,
+	Confused,
+};
+
+
 UCLASS()
 class STEALTHGAME_API AEnemyAIController : public AAIController
 {
@@ -20,7 +31,8 @@ public:
 
 	AMyPlayerCharacter* PlayerCharacter = nullptr;
 
-
+	UPROPERTY()
+	EAIStates CurrentAIState;
 
 	virtual void BeginPlay() override;
 	//DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FActorPerceptionUpdatedDelegate, AActor*, Actor, FAIStimulus, Stimulus);

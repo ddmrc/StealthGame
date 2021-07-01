@@ -4,6 +4,8 @@
 #include "Enemy/EnemyAIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Perception/AIPerceptionComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Enum.h"
 
 void AEnemyAIController::BeginPlay()
 {
@@ -31,13 +33,26 @@ void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stim
 {
 	if (Stimulus.WasSuccessfullySensed())
 	{
+
+		CurrentAIState = EAIStates::Detected;
+		GetBlackboardComponent()->SetValue<UBlackboardKeyType_Enum>(FName("CurrentState"), (uint8)CurrentAIState);
+		//uint8 ThisCurrentState = GetBlackboardComponent()->GetValue<UBlackboardKeyType_Enum>("CurrentState");
+		
+
+			
 		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Player Detected"));
+			
 		}
 	}
 	else
 	{
+
+		CurrentAIState = EAIStates::Idle;
+		GetBlackboardComponent()->SetValue<UBlackboardKeyType_Enum>(FName("CurrentState"), (uint8)CurrentAIState);
+
+
 		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player Undetected"));
