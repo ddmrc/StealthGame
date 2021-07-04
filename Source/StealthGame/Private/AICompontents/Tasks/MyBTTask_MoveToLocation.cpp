@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
+#include "Enemy/EnemyAIController.h"
 #include "GameFramework/Character.h"
 
 
@@ -53,14 +54,7 @@ EBTNodeResult::Type UMyBTTask_MoveToLocation::ExecuteTask(UBehaviorTreeComponent
 		}
 	}
 
-	//Set Target to
-	
+
 	return EBTNodeResult::Succeeded;
 }
 
-void UMyBTTask_MoveToLocation::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
-{
-	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-	
-
-}

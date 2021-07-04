@@ -25,39 +25,81 @@ void AEnemyAIController::BeginPlay()
 
 	}
 
+	//setting up timerhandle for this function
+	TimerConfusedToSearch.BindUFunction(this, FName("SetAIState"), EAIStates::Searching);
+	TimerDetectedToChasing.BindUFunction(this, FName("SetAIState"), EAIStates::Chasing);
+
+	//SETTING UP AI BEHAVIOUR TREE & BLACKBOARD
+	CurrentAIState = EAIStates::Searching;
+	GetBlackboardComponent()->SetValue<UBlackboardKeyType_Enum>(FName("CurrentState"), (uint8)CurrentAIState);
+	GetBlackboardComponent()->SetValueAsObject("PlayerCharacter", PlayerCharacter);
 }
 
 
 
 void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
-	if (Stimulus.WasSuccessfullySensed())
+
+
+
+	if (Stimulus.WasSuccessfullySensed() )
 	{
 
-		CurrentAIState = EAIStates::Detected;
-		GetBlackboardComponent()->SetValue<UBlackboardKeyType_Enum>(FName("CurrentState"), (uint8)CurrentAIState);
-		//uint8 ThisCurrentState = GetBlackboardComponent()->GetValue<UBlackboardKeyType_Enum>("CurrentState");
-		
-
-			
-		if (GEngine)
+		if (CurrentAIState == EAIStates::Searching || CurrentAIState == EAIStates::Confused)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Player Detected"));
-			
+			SetAIState(EAIStates::Detected);
+			GetWorld()->GetTimerManager().SetTimer(ConfusedTimer, TimerDetectedToChasing, 1.0f, false);
 		}
+
+	}
+	else if (!Stimulus.IsActive() && CurrentAIState == EAIStates::Chasing)
+	{
+
+		SetAIState(EAIStates::Confused);
+
+		GetWorld()->GetTimerManager().SetTimer(ConfusedTimer, TimerConfusedToSearch, 2.0f, false);
+
 	}
 	else
 	{
 
-		CurrentAIState = EAIStates::Idle;
-		GetBlackboardComponent()->SetValue<UBlackboardKeyType_Enum>(FName("CurrentState"), (uint8)CurrentAIState);
+		SetAIState(EAIStates::Searching);
 
-
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player Undetected"));
-		}
 	}
+
+
+
 	
 }
 
+void AEnemyAIController::SetAIState(EAIStates NewState)
+{
+	CurrentAIState = NewState;
+	GetBlackboardComponent()->SetValue<UBlackboardKeyType_Enum>(FName("CurrentState"), (uint8)CurrentAIState);
+
+	//Debug Lines
+	if (GEngine)
+	{
+		switch (NewState)
+		{
+		case EAIStates::Idle:
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("AI Idle"));
+			break;
+		case EAIStates::Detected:
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Player Detected"));
+			break;
+		case EAIStates::Searching:
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player Hidden"));
+			break;
+		case EAIStates::Chasing:
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Player Being Chasing"));
+			break;
+		case EAIStates::Confused:
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Orange, TEXT("AI Confused"));
+			break;
+
+
+		}
+	}
+		
+}

@@ -34,11 +34,17 @@ public:
 	UPROPERTY()
 	EAIStates CurrentAIState;
 
+	FTimerHandle ConfusedTimer;
+	FTimerDelegate TimerConfusedToSearch;
+	FTimerDelegate TimerDetectedToChasing;
+
 	virtual void BeginPlay() override;
 	//DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FActorPerceptionUpdatedDelegate, AActor*, Actor, FAIStimulus, Stimulus);
 	UFUNCTION()
 	void TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
+	UFUNCTION()
+	void SetAIState(EAIStates NewState);
 
 
 };
