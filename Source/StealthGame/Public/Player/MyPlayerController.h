@@ -21,12 +21,12 @@ public:
 	//VARIABLES
 	AMyPlayerCharacter* PlayerCharacter = nullptr;
 
+	//Walking & Sprint Speeds
+
+
 protected:
 
 	
-	
-
-
 
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -37,6 +37,8 @@ protected:
 	void RequestLookSide(float AxisVal);
 
 	void RequestCrouch();
+	void RequestSprint();
+	void RequestSprintEnd();
 
 	
 

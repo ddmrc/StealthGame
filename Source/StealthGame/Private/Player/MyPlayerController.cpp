@@ -31,8 +31,8 @@ void AMyPlayerController::SetupInputComponent()
 		InputComponent->BindAction(TEXT("Jump"), EInputEvent::IE_Released, this, &AMyPlayerController::RequestStopJump);
 
 
-		InputComponent->BindAction(TEXT("Sprint"), EInputEvent::IE_Pressed, this, &AMyPlayerController::RequestSprintStart);
-		InputComponent->BindAction(TEXT("Sprint"), EInputEvent::IE_Released, this, &AMyPlayerController::RequestSprintEnd);*/
+;
+		*/
 
 		InputComponent->BindAxis(TEXT("MoveForward"), this, &AMyPlayerController::RequestMoveForward);
 		InputComponent->BindAxis(TEXT("MoveRight"), this, &AMyPlayerController::RequestMoveSideways);
@@ -40,7 +40,9 @@ void AMyPlayerController::SetupInputComponent()
 		InputComponent->BindAxis(TEXT("LookRight"), this, &AMyPlayerController::RequestLookSide);
 
 		InputComponent->BindAction(TEXT("Crouch"), EInputEvent::IE_Pressed, this, &AMyPlayerController::RequestCrouch);
-		
+
+		InputComponent->BindAction(TEXT("Sprint"), EInputEvent::IE_Pressed, this, &AMyPlayerController::RequestSprint);
+		InputComponent->BindAction(TEXT("Sprint"), EInputEvent::IE_Released, this, &AMyPlayerController::RequestSprintEnd);
 	}
 }
 
@@ -77,6 +79,22 @@ void AMyPlayerController::RequestCrouch()
 	else
 	{
 		PlayerCharacter->PlayerUnCrouch();
+	}
+}
+
+void AMyPlayerController::RequestSprint()
+{
+	if (!PlayerCharacter->bIsPlayerSprinting)
+	{
+		PlayerCharacter->PlayerSprint();
+	}
+}
+
+void AMyPlayerController::RequestSprintEnd()
+{
+	if (PlayerCharacter->bIsPlayerSprinting)
+	{
+		PlayerCharacter->PlayerStopSprint();
 	}
 }
 

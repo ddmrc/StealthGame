@@ -18,6 +18,15 @@ public:
 	UMyBTTask_MoveToLocation(const FObjectInitializer& objectInitializer);
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
+	//IF I WANT TO DO SOMETHING WHEN IT ABORTS
+	//virtual EBTNodeResult::Type AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+	//IF I WANT TO DO SOMETHING WHILE IT TICKS (AFTER EXECUTE)
+	//virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
+
+	//CustomTask Setup Target
+	void SelectTarget(UBehaviorTreeComponent& OwnerComp);
+
 protected:
 	TArray <AActor*> MoveToLocationList;
 

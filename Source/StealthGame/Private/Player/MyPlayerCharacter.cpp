@@ -20,6 +20,7 @@ void AMyPlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	
+	WalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	
 	
 }
@@ -77,13 +78,33 @@ void AMyPlayerCharacter::LookSide(float AxisVal)
 
 void AMyPlayerCharacter::PlayerCrouch()
 {
-
+	if (bIsPlayerSprinting)
+	{
+		PlayerStopSprint();
+	}
 	 Crouch(false);
 	 
 }
 void AMyPlayerCharacter::PlayerUnCrouch()
 {
 	UnCrouch();
+}
+
+
+void AMyPlayerCharacter::PlayerSprint()
+{
+	if (bIsCrouched)
+	{
+
+		PlayerUnCrouch();
+	}
+	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	bIsPlayerSprinting = true;
+}
+void AMyPlayerCharacter::PlayerStopSprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	bIsPlayerSprinting = false;
 }
 
 bool AMyPlayerCharacter::CanBeSeenFrom(const FVector& ObserverLocation, FVector& OutSeenLocation,
@@ -117,3 +138,4 @@ bool AMyPlayerCharacter::CanBeSeenFrom(const FVector& ObserverLocation, FVector&
 	OutSightStrength = 0;
 	return false;
 }
+

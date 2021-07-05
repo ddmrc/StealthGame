@@ -19,19 +19,55 @@ UMyBTTask_MoveToLocation::UMyBTTask_MoveToLocation(const FObjectInitializer& obj
 
 EBTNodeResult::Type UMyBTTask_MoveToLocation::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	Super::ExecuteTask(OwnerComp, NodeMemory);
+	//Super::ExecuteTask(OwnerComp, NodeMemory);
+	EBTNodeResult::Type NodeResult = EBTNodeResult::InProgress;
 
+	SelectTarget(OwnerComp);
+
+	//COPY PASTE FROM ORIGINAL SOURCE CODE
+	FBTMoveToTaskMemory* MyMemory = CastInstanceNodeMemory<FBTMoveToTaskMemory>(NodeMemory);
+	MyMemory->PreviousGoalLocation = FAISystem::InvalidLocation;
+	MyMemory->MoveRequestID = FAIRequestID::InvalidRequest;
+
+	AAIController* MyController = OwnerComp.GetAIOwner();
+	MyMemory->bWaitingForPath = bUseGameplayTasks ? false : MyController->ShouldPostponePathUpdates();
+	if (!MyMemory->bWaitingForPath)
+	{
+		NodeResult = PerformMoveTask(OwnerComp, NodeMemory);
+	}
+
+
+	if (NodeResult == EBTNodeResult::InProgress && bObserveBlackboardValue)
+	{
+		UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
+		if (ensure(BlackboardComp))
+		{
+			if (MyMemory->BBObserverDelegateHandle.IsValid())
+			{
+				BlackboardComp->UnregisterObserver(BlackboardKey.GetSelectedKeyID(), MyMemory->BBObserverDelegateHandle);
+			}
+			MyMemory->BBObserverDelegateHandle = BlackboardComp->RegisterObserver(BlackboardKey.GetSelectedKeyID(), this, FOnBlackboardChangeNotification::CreateUObject(this, &UBTTask_MoveTo::OnBlackboardValueChange));
+		}
+	}
+
+	return NodeResult;
+
+}
+
+
+void UMyBTTask_MoveToLocation::SelectTarget(UBehaviorTreeComponent& OwnerComp)
+{
 	if (MoveToLocationList.Num() == 0)
 	{
 		UGameplayStatics::GetAllActorsOfClass(this, AMoveToLocationActor::StaticClass(), MoveToLocationList);
 
 	}
 
-	
+
 
 	if (MoveToLocationList.Num() > 0 && bIsMoveToLocationReached)
 	{
-		int RandomNumber = FMath::RandRange(0, MoveToLocationList.Num()-1);
+		int RandomNumber = FMath::RandRange(0, MoveToLocationList.Num() - 1);
 
 		if (MoveToLocationList.IsValidIndex(RandomNumber))
 		{
@@ -46,15 +82,28 @@ EBTNodeResult::Type UMyBTTask_MoveToLocation::ExecuteTask(UBehaviorTreeComponent
 	{
 
 
-		if (OwnerComp.GetAIOwner()->GetCharacter()->GetActorLocation().Equals(CurrentMoveToTarget->GetActorLocation(),50.f))
+		if (OwnerComp.GetAIOwner()->GetCharacter()->GetActorLocation().Equals(CurrentMoveToTarget->GetActorLocation(), 50.f))
 		{
-			
+
 
 			bIsMoveToLocationReached = true;
 		}
 	}
-
-
-	return EBTNodeResult::Succeeded;
 }
+
+//EBTNodeResult::Type UMyBTTask_MoveToLocation::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+//{
+//	Super::AbortTask(OwnerComp, NodeMemory);
+//
+//	UE_LOG(LogTemp, Warning, TEXT("ABORT"));
+//
+//	return EBTNodeResult::Aborted;
+//}
+//
+//void UMyBTTask_MoveToLocation::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+//{
+//	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
+//	UE_LOG(LogTemp, Warning, TEXT("TICK"));
+//}
+
 

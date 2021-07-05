@@ -29,6 +29,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsPlayerMoving();
 	UFUNCTION(BlueprintCallable)
+	bool IsPlayerSprinting();
+	UFUNCTION(BlueprintCallable)
 	float GetFrontAxisValue();	
 	UFUNCTION(BlueprintCallable)
 	float GetSideAxisValue();

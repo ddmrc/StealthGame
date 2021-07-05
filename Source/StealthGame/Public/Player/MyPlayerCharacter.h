@@ -38,6 +38,10 @@ public:
 	void PlayerCrouch();
 	void PlayerUnCrouch();
 
+	void PlayerSprint();
+	void PlayerStopSprint();
+
+	bool bIsPlayerSprinting = false;
 
 
 
@@ -46,8 +50,17 @@ public:
 		float BaseLookUpRate = 90.0f;
 
 	/** Base lookright rate, in deg/sec. Other scaling may affect final lookup rate. */
-	UPROPERTY(EditAnywhere, Category = "Look")
+	UPROPERTY(EditAnywhere, Category = "Locomotion")
 		float BaseLookRightRate = 90.0f;
+
+
+	//Walk Speed
+	float WalkSpeed = 400.f;
+
+	//SprintSpeed
+	UPROPERTY(EditAnywhere, Category = "Locomotion")
+	float SprintSpeed = 750.f;
+
 
 	float FrontAxisValue = 0.0f;
 	float SideAxisValue = 0.0f;

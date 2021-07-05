@@ -12,23 +12,10 @@ void UMyPlayerAnimInstance::NativeBeginPlay()
 	PlayerCharacter = Cast<AMyPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 }
 
-bool UMyPlayerAnimInstance::IsPlayerCrouching()
-{
-	if (PlayerCharacter)
-	{
-		//UE_LOG(LogTemp,Warning,TEXT("%s"),PlayerCharacter->GetMovementComponent()->IsCrouching()? "true":"false");
-		return PlayerCharacter->GetMovementComponent()->IsCrouching();
-	}
-	else
-		return false;
-}
+
 
 float UMyPlayerAnimInstance::GetFrontAxisValue()
 {
-
-
-
-
 
 
 	if (PlayerCharacter)
@@ -111,4 +98,27 @@ bool UMyPlayerAnimInstance::IsPlayerMoving()
 	}
 
 	return false;
+}
+
+bool UMyPlayerAnimInstance::IsPlayerCrouching()
+{
+	if (PlayerCharacter)
+	{
+		//UE_LOG(LogTemp,Warning,TEXT("%s"),PlayerCharacter->GetMovementComponent()->IsCrouching()? "true":"false");
+		return PlayerCharacter->GetMovementComponent()->IsCrouching();
+	}
+	else
+		return false;
+}
+
+bool UMyPlayerAnimInstance::IsPlayerSprinting()
+{
+	bool bIsSprinting = false;
+
+	if (PlayerCharacter)
+	{
+		bIsSprinting = PlayerCharacter->bIsPlayerSprinting;
+	}
+
+	return bIsSprinting;
 }
