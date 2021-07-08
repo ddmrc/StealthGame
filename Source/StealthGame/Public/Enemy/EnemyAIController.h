@@ -17,8 +17,9 @@ enum class EAIStates : uint8
 	Idle,
 	Detected,
 	Chasing,
-	Searching,
+	Patrol,
 	Confused,
+	Searching,
 };
 
 
