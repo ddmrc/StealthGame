@@ -26,11 +26,11 @@ void AEnemyAIController::BeginPlay()
 	}
 
 	//setting up timerhandle for this function
-	TimerConfusedToSearch.BindUFunction(this, FName("SetAIState"), EAIStates::Searching);
+	TimerConfusedToSearch.BindUFunction(this, FName("SetAIState"), EAIStates::Patrol);
 	TimerDetectedToChasing.BindUFunction(this, FName("SetAIState"), EAIStates::Chasing);
 
 	//SETTING UP AI BEHAVIOUR TREE & BLACKBOARD
-	CurrentAIState = EAIStates::Searching;
+	CurrentAIState = EAIStates::Patrol;
 	GetBlackboardComponent()->SetValue<UBlackboardKeyType_Enum>(FName("CurrentState"), (uint8)CurrentAIState);
 	GetBlackboardComponent()->SetValueAsObject("PlayerCharacter", PlayerCharacter);
 }
@@ -45,7 +45,7 @@ void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stim
 	if (Stimulus.WasSuccessfullySensed() )
 	{
 
-		if (CurrentAIState == EAIStates::Searching || CurrentAIState == EAIStates::Confused)
+		if (CurrentAIState == EAIStates::Patrol || CurrentAIState == EAIStates::Confused)
 		{
 			SetAIState(EAIStates::Detected);
 			GetWorld()->GetTimerManager().SetTimer(ConfusedTimer, TimerDetectedToChasing, 1.0f, false);
@@ -63,7 +63,7 @@ void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stim
 	else
 	{
 
-		SetAIState(EAIStates::Searching);
+		SetAIState(EAIStates::Patrol);
 
 	}
 
@@ -88,7 +88,7 @@ void AEnemyAIController::SetAIState(EAIStates NewState)
 		case EAIStates::Detected:
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Player Detected"));
 			break;
-		case EAIStates::Searching:
+		case EAIStates::Patrol:
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player Hidden"));
 			break;
 		case EAIStates::Chasing:
@@ -96,6 +96,9 @@ void AEnemyAIController::SetAIState(EAIStates NewState)
 			break;
 		case EAIStates::Confused:
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Orange, TEXT("AI Confused"));
+			break;
+		case EAIStates::Searching:
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("AI Searching"));
 			break;
 
 
