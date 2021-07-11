@@ -4,7 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Enemy/EnemyAIController.h"
 #include "EnemyCharacter.generated.h"
+
+UENUM()
+enum class EMovementState : uint8
+{
+	Idle,
+	Walking,
+	Stopped,
+	Running,
+	Crouching,
+
+};
+
 
 UCLASS()
 class STEALTHGAME_API AEnemyCharacter : public ACharacter
@@ -15,11 +28,19 @@ public:
 	// Sets default values for this character's properties
 	AEnemyCharacter();
 	
+
+	//Updates Movement State According to AI State
+	void UpdateMovementState();
+
+	EMovementState GetMovementState();
+
+	EAIStates GetAICurrentState();
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
 
 
 
@@ -28,6 +49,9 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	EMovementState CurrentMovementState;
+	
 
 
 

@@ -46,6 +46,13 @@ void AMyPlayerCharacter::MoveForward(float AxisVal)
 		FRotator const ControlSpaceRot = GetControlRotation();
 		// transform to world space and add it
 		AddMovementInput(FRotationMatrix(ControlSpaceRot).GetScaledAxis(EAxis::X), AxisVal);
+		bIsPlayerMoving = true;
+
+
+	}
+	else
+	{
+		bIsPlayerMoving = false;
 	}
 
 	FrontAxisValue = AxisVal;
@@ -60,6 +67,14 @@ void AMyPlayerCharacter::MoveSideways(float AxisVal)
 		FRotator const ControlSpaceRot = GetControlRotation();
 		// transform to world space and add it
 		AddMovementInput(FRotationMatrix(ControlSpaceRot).GetScaledAxis(EAxis::Y), AxisVal);
+		bIsPlayerMoving = true;
+
+
+
+	}
+	else
+	{
+		bIsPlayerMoving = false;
 	}
 
 	SideAxisValue = AxisVal;
@@ -69,6 +84,7 @@ void AMyPlayerCharacter::LookUp(float AxisVal)
 {
 	
 	UGameplayStatics::GetPlayerController(GetWorld(),0)->AddPitchInput(AxisVal * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+
 }
 
 void AMyPlayerCharacter::LookSide(float AxisVal)
@@ -87,19 +103,30 @@ void AMyPlayerCharacter::PlayerCrouch()
 }
 void AMyPlayerCharacter::PlayerUnCrouch()
 {
+	
 	UnCrouch();
 }
 
 
 void AMyPlayerCharacter::PlayerSprint()
 {
-	if (bIsCrouched)
+	if (bIsCrouched && bIsPlayerMoving)
 	{
-
 		PlayerUnCrouch();
+		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+		bIsPlayerSprinting = true;
 	}
-	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-	bIsPlayerSprinting = true;
+	else if (bIsCrouched && !bIsPlayerMoving)
+	{
+		bIsPlayerSprinting = true;
+	}
+	else if (!bIsCrouched)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+		bIsPlayerSprinting = true;
+	}
+
+
 }
 void AMyPlayerCharacter::PlayerStopSprint()
 {

@@ -106,3 +106,8 @@ void AEnemyAIController::SetAIState(EAIStates NewState)
 	}
 		
 }
+
+EAIStates AEnemyAIController::RequestGetAIState()
+{
+	return CurrentAIState;
+}

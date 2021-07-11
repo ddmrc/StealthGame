@@ -47,5 +47,8 @@ public:
 	UFUNCTION()
 	void SetAIState(EAIStates NewState);
 
+	UFUNCTION()
+	EAIStates RequestGetAIState();
+
 
 };

@@ -5,6 +5,8 @@
 #include "Kismet/GameplayStatics.h"
 
 
+
+
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
 {
@@ -18,7 +20,7 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
-
+	CurrentMovementState = EMovementState::Idle;
 }
 
 // Called every frame
@@ -27,7 +29,7 @@ void AEnemyCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	
-
+	UpdateMovementState();
 
 
 }
@@ -40,3 +42,44 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 }
 
 
+void AEnemyCharacter::UpdateMovementState()
+{
+	AEnemyAIController* ThisController = Cast<AEnemyAIController>(GetController());
+	if (ThisController->CurrentAIState == EAIStates::Idle && CurrentMovementState != EMovementState::Idle)
+	{
+		CurrentMovementState = EMovementState::Idle;
+	}
+	else if ((ThisController->CurrentAIState == EAIStates::Patrol || ThisController->CurrentAIState == EAIStates::Searching) && CurrentMovementState != EMovementState::Walking)
+	{
+		CurrentMovementState = EMovementState::Walking;
+	}
+	else if (ThisController->CurrentAIState == EAIStates::Chasing && CurrentMovementState != EMovementState::Running)
+	{
+		CurrentMovementState = EMovementState::Running;
+	}
+	else if ((ThisController->CurrentAIState == EAIStates::Detected || ThisController->CurrentAIState == EAIStates::Confused) && CurrentMovementState != EMovementState::Stopped)
+	{
+		CurrentMovementState = EMovementState::Stopped;
+	}
+	
+
+
+}
+
+EMovementState AEnemyCharacter::GetMovementState()
+{
+
+	return CurrentMovementState;
+}
+
+EAIStates AEnemyCharacter::GetAICurrentState()
+{
+	if (Cast<AEnemyAIController>(GetController()))
+	{
+		return Cast<AEnemyAIController>(GetController())->RequestGetAIState();
+	}
+	else
+	{
+		return EAIStates::Idle;
+	}
+}

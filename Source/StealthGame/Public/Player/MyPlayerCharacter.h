@@ -42,7 +42,7 @@ public:
 	void PlayerStopSprint();
 
 	bool bIsPlayerSprinting = false;
-
+	bool bIsPlayerMoving = false;
 
 
 	/** Base lookup rate, in deg/sec. Other scaling may affect final lookup rate. */
