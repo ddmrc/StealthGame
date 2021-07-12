@@ -136,3 +136,21 @@ bool UEnemyAnimInstance::IsAIConfused()
 	}
 }
 
+bool UEnemyAnimInstance::IsAILookingAround()
+{
+	if (ThisCharacter)
+	{
+		if (GetCurrentAIState() == EAIStates::LookingAround)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return false;
+	}
+}

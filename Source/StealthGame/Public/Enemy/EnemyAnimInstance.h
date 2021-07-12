@@ -37,4 +37,6 @@ public:
 	bool IsPlayerDetected();
 	UFUNCTION(BlueprintCallable)
 	bool IsAIConfused();
+	UFUNCTION(BlueprintCallable)
+	bool IsAILookingAround();
 };

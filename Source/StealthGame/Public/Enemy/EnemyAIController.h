@@ -20,6 +20,7 @@ enum class EAIStates : uint8
 	Patrol,
 	Confused,
 	Searching,
+	LookingAround,
 };
 
 
@@ -36,10 +37,14 @@ public:
 	EAIStates CurrentAIState;
 
 	FTimerHandle ConfusedTimer;
-	FTimerDelegate TimerConfusedToSearch;
+	FTimerHandle LookAroundTimer;
+
+	FTimerDelegate TimerConfusedToPatrol;
 	FTimerDelegate TimerDetectedToChasing;
+	FTimerDelegate TimerDetectedToLookAround;
 
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
 	//DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FActorPerceptionUpdatedDelegate, AActor*, Actor, FAIStimulus, Stimulus);
 	UFUNCTION()
 	void TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
@@ -49,6 +54,8 @@ public:
 
 	UFUNCTION()
 	EAIStates RequestGetAIState();
+
+	void AILookAroundMechanic();
 
 
 };

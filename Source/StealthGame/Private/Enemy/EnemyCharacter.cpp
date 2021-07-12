@@ -61,6 +61,10 @@ void AEnemyCharacter::UpdateMovementState()
 	{
 		CurrentMovementState = EMovementState::Stopped;
 	}
+	else if (ThisController->CurrentAIState == EAIStates::LookingAround)
+	{
+		CurrentMovementState = EMovementState::StaticSearch;
+	}
 	
 
 

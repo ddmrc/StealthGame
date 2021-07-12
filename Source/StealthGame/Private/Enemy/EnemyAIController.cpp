@@ -26,8 +26,9 @@ void AEnemyAIController::BeginPlay()
 	}
 
 	//setting up timerhandle for this function
-	TimerConfusedToSearch.BindUFunction(this, FName("SetAIState"), EAIStates::Patrol);
+	TimerConfusedToPatrol.BindUFunction(this, FName("SetAIState"), EAIStates::Patrol);
 	TimerDetectedToChasing.BindUFunction(this, FName("SetAIState"), EAIStates::Chasing);
+	TimerDetectedToLookAround.BindUFunction(this, FName("SetAIState"), EAIStates::LookingAround);
 
 	//SETTING UP AI BEHAVIOUR TREE & BLACKBOARD
 	CurrentAIState = EAIStates::Patrol;
@@ -35,7 +36,15 @@ void AEnemyAIController::BeginPlay()
 	GetBlackboardComponent()->SetValueAsObject("PlayerCharacter", PlayerCharacter);
 }
 
+void AEnemyAIController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 
+	AILookAroundMechanic();
+
+		
+	
+}
 
 void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
@@ -57,14 +66,21 @@ void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stim
 
 		SetAIState(EAIStates::Confused);
 
-		GetWorld()->GetTimerManager().SetTimer(ConfusedTimer, TimerConfusedToSearch, 2.0f, false);
+		GetWorld()->GetTimerManager().SetTimer(ConfusedTimer, TimerConfusedToPatrol, 2.0f, false);
 
 	}
 	else
 	{
+		if (CurrentAIState != EAIStates::LookingAround)
+		{
+			SetAIState(EAIStates::Patrol);
+		}
+			
 
-		SetAIState(EAIStates::Patrol);
 
+
+
+		
 	}
 
 
@@ -100,6 +116,9 @@ void AEnemyAIController::SetAIState(EAIStates NewState)
 		case EAIStates::Searching:
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("AI Searching"));
 			break;
+		case EAIStates::LookingAround:
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::White, TEXT("AI Looking Around"));
+			break;
 
 
 		}
@@ -110,4 +129,30 @@ void AEnemyAIController::SetAIState(EAIStates NewState)
 EAIStates AEnemyAIController::RequestGetAIState()
 {
 	return CurrentAIState;
+}
+
+void AEnemyAIController::AILookAroundMechanic()
+{
+	if (CurrentAIState == EAIStates::Patrol || CurrentAIState == EAIStates::LookingAround)
+	{
+		if (!GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer) && CurrentAIState == EAIStates::Patrol)
+		{
+
+			GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
+			float RandFloatLookAround = FMath::FRandRange(3.f, 5.f);
+			GetWorld()->GetTimerManager().SetTimer(LookAroundTimer, TimerDetectedToLookAround, RandFloatLookAround, false);
+
+		}
+		else if (!GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer) && CurrentAIState == EAIStates::LookingAround)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
+			GetWorld()->GetTimerManager().SetTimer(LookAroundTimer, TimerConfusedToPatrol, 2.f, false);
+		}
+	}
+	else
+	{
+
+		GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
+	}
+
 }

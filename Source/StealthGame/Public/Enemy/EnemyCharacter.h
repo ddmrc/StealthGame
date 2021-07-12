@@ -15,6 +15,7 @@ enum class EMovementState : uint8
 	Stopped,
 	Running,
 	Crouching,
+	StaticSearch,
 
 };
 
