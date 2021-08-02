@@ -32,7 +32,6 @@ void UCustom_FootstepSound::Notify(USkeletalMeshComponent* MeshComp, UAnimSequen
 			UAISense_Hearing::ReportNoiseEvent(MeshComp->GetWorld(), SoundLocation, 1.f, MeshComp->GetOwner(), MaxSoundDistanceDetection * CustomVolumeMultiplier);
 
 
-
 		}
 	}
 }

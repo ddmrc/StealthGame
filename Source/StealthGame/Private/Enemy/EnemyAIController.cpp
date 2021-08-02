@@ -44,6 +44,9 @@ void AEnemyAIController::Tick(float DeltaTime)
 
 	AILookAroundMechanic();
 
+
+
+
 		
 	
 }
@@ -150,11 +153,20 @@ void AEnemyAIController::AILookAroundMechanic()
 			GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
 			GetWorld()->GetTimerManager().SetTimer(LookAroundTimer, TimerConfusedToPatrol, 2.f, false);
 		}
+
+		if (PerceptionComponent->HasAnyActiveStimulus(*PlayerCharacter))
+		{
+			SetAIState(EAIStates::Detected);
+			GetWorld()->GetTimerManager().SetTimer(ConfusedTimer, TimerDetectedToChasing, 1.0f, false);
+		}
 	}
 	else
 	{
 
 		GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
 	}
+
+
+
 
 }
