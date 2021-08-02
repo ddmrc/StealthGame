@@ -19,8 +19,10 @@ public:
 
 	UCustom_FootstepSound();
 
+	//UPROPERTY(EditAnywhere)
+	float MaxSoundDistanceDetection = 1000.f;
 	UPROPERTY(EditAnywhere)
-	float MaxSoundDistanceDetection = 500.f;
+	float CustomVolumeMultiplier = 1.f;
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 };

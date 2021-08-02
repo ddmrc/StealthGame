@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Perception/AISightTargetInterface.h"
+#include "GenericTeamAgentInterface.h"
 #include "MyPlayerCharacter.generated.h"
 
 UCLASS()
-class STEALTHGAME_API AMyPlayerCharacter : public ACharacter, public IAISightTargetInterface
+class STEALTHGAME_API AMyPlayerCharacter : public ACharacter, public IAISightTargetInterface, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -19,6 +20,12 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+private:
+	FGenericTeamId TeamID;
+public:
+	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID)override { TeamID = NewTeamID; }
+	virtual FGenericTeamId GetGenericTeamId() const override { return TeamID; }
 
 public:	
 	// Called every frame

@@ -22,7 +22,7 @@ void AMyPlayerCharacter::BeginPlay()
 	
 	WalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	
-	
+	SetGenericTeamId(7);
 }
 
 // Called every frame

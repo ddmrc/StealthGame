@@ -23,6 +23,8 @@ void AFloorTrap::BeginPlay()
 	{
 		PlayerActor = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	}
+
+	
 	
 }
 

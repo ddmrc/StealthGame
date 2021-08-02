@@ -19,6 +19,8 @@ void AMyPlayerController::BeginPlay()
 	{
 		PlayerCharacter = Cast< AMyPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	}
+
+
 }
 
 void AMyPlayerController::SetupInputComponent()

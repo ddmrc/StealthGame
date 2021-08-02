@@ -33,7 +33,9 @@ void AEnemyAIController::BeginPlay()
 	//SETTING UP AI BEHAVIOUR TREE & BLACKBOARD
 	CurrentAIState = EAIStates::Patrol;
 	GetBlackboardComponent()->SetValue<UBlackboardKeyType_Enum>(FName("CurrentState"), (uint8)CurrentAIState);
-	GetBlackboardComponent()->SetValueAsObject("PlayerCharacter", PlayerCharacter);
+	GetBlackboardComponent()->SetValueAsObject("PlayerCharacter", PlayerCharacter); 
+
+	SetGenericTeamId(2);
 }
 
 void AEnemyAIController::Tick(float DeltaTime)

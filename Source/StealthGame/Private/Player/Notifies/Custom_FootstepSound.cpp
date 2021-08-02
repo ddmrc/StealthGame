@@ -20,14 +20,18 @@ UCustom_FootstepSound::UCustom_FootstepSound()
 
 void UCustom_FootstepSound::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
+	
+
 	if (Sound)
 	{
 		if (Sound->IsPlayable())
 		{
 			FVector SoundLocation = MeshComp->GetBoneLocation("pelvis", EBoneSpaces::WorldSpace);
 
-			UGameplayStatics::PlaySoundAtLocation(MeshComp->GetWorld(), Sound, SoundLocation, 1.f, 1.f, 0.f);
-			UAISense_Hearing::ReportNoiseEvent(MeshComp->GetWorld(), SoundLocation, 1.f, MeshComp->GetOwner(), MaxSoundDistanceDetection);
+			UGameplayStatics::PlaySoundAtLocation(MeshComp->GetWorld(), Sound, SoundLocation, CustomVolumeMultiplier, 1.f, 0.f);
+			UAISense_Hearing::ReportNoiseEvent(MeshComp->GetWorld(), SoundLocation, 1.f, MeshComp->GetOwner(), MaxSoundDistanceDetection * CustomVolumeMultiplier);
+
+
 
 		}
 	}
