@@ -21,8 +21,7 @@ public:
 
 	//UPROPERTY(EditAnywhere)
 	float MaxSoundDistanceDetection = 1000.f;
-	UPROPERTY(EditAnywhere)
-	float CustomVolumeMultiplier = 1.f;
+
 
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
 };
