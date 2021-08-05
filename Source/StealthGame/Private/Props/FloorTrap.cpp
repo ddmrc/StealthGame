@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Perception/AISense_Hearing.h"
 #include "GameFramework/Character.h"
+#include "CustomSound/CustomSoundWrapper.h"
 
 // Sets default values
 AFloorTrap::AFloorTrap()
@@ -43,8 +44,10 @@ void AFloorTrap::NotifyActorBeginOverlap(AActor* OtherActor)
 
 	if (SoundEffect->IsPlayable()&& PlayerActor && OtherActor == PlayerActor)
 	{
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundEffect, GetActorLocation());
-		UAISense_Hearing::ReportNoiseEvent(GetWorld(), GetActorLocation(), 1.f, OtherActor, MaxSoundDistanceDetection);
+		//UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundEffect, GetActorLocation());
+		//UAISense_Hearing::ReportNoiseEvent(GetWorld(), GetActorLocation(), 1.f, OtherActor, MaxSoundDistanceDetection);
+		float VolumeMultiplier = 1.f;
+		CustomSoundWrapper::PlaySound(GetWorld(), SoundEffect, GetActorLocation(), VolumeMultiplier, OtherActor, MaxSoundDistanceDetection);
 	}
 
 }

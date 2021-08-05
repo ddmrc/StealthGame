@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Perception/AISense_Hearing.h"
 #include "GameFramework/Character.h"
+#include "CustomSound/CustomSoundWrapper.h"
 
 UCustom_FootstepSound::UCustom_FootstepSound()
 	: Super()
@@ -28,9 +29,9 @@ void UCustom_FootstepSound::Notify(USkeletalMeshComponent* MeshComp, UAnimSequen
 		{
 			FVector SoundLocation = MeshComp->GetBoneLocation("pelvis", EBoneSpaces::WorldSpace);
 
-			UGameplayStatics::PlaySoundAtLocation(MeshComp->GetWorld(), Sound, SoundLocation, VolumeMultiplier, 1.f, 0.f);
-			UAISense_Hearing::ReportNoiseEvent(MeshComp->GetWorld(), SoundLocation, 1.f, MeshComp->GetOwner(), MaxSoundDistanceDetection * VolumeMultiplier);
-
+			//UGameplayStatics::PlaySoundAtLocation(MeshComp->GetWorld(), Sound, SoundLocation, VolumeMultiplier, 1.f, 0.f);
+			//UAISense_Hearing::ReportNoiseEvent(MeshComp->GetWorld(), SoundLocation, 1.f, MeshComp->GetOwner(), MaxSoundDistanceDetection * VolumeMultiplier);
+			CustomSoundWrapper::PlaySound(MeshComp->GetWorld(), Sound, SoundLocation, 1.f, MeshComp->GetOwner(), MaxSoundDistanceDetection * VolumeMultiplier);
 
 		}
 	}
