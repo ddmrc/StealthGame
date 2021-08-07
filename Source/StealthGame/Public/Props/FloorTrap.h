@@ -22,6 +22,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float MaxSoundDistanceDetection = 1000.f;
+	UPROPERTY(EditAnywhere)
+	float SoundVolumeMultiplier = 1.f;
 protected:
 
 
@@ -30,6 +32,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	ACharacter* PlayerActor = nullptr;
+
+	bool bIsActive = true;
 
 public:	
 	// Called every frame

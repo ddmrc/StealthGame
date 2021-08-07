@@ -25,6 +25,7 @@ void AFloorTrap::BeginPlay()
 		PlayerActor = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	}
 
+	bIsActive = true;
 	
 	
 }
@@ -42,12 +43,13 @@ void AFloorTrap::NotifyActorBeginOverlap(AActor* OtherActor)
 	Super::NotifyActorBeginOverlap(OtherActor);
 
 
-	if (SoundEffect->IsPlayable()&& PlayerActor && OtherActor == PlayerActor)
+	if (SoundEffect->IsPlayable()&& PlayerActor && OtherActor == PlayerActor && bIsActive)
 	{
 		//UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundEffect, GetActorLocation());
 		//UAISense_Hearing::ReportNoiseEvent(GetWorld(), GetActorLocation(), 1.f, OtherActor, MaxSoundDistanceDetection);
-		float VolumeMultiplier = 1.f;
-		CustomSoundWrapper::PlaySound(GetWorld(), SoundEffect, GetActorLocation(), VolumeMultiplier, OtherActor, MaxSoundDistanceDetection);
+		
+		CustomSoundWrapper::PlaySoundAtLocation(GetWorld(), SoundEffect, GetActorLocation(), SoundVolumeMultiplier, OtherActor, MaxSoundDistanceDetection);
+		bIsActive = false;
 	}
 
 }

@@ -26,9 +26,9 @@ CustomSoundWrapper::~CustomSoundWrapper()
 }
 
 
-void CustomSoundWrapper::PlaySound(UWorld* World, USoundBase* SoundCue, FVector NoiseLocation, float Loudness, AActor* Instigator, float MaxRange)
+void CustomSoundWrapper::PlaySoundAtLocation(UWorld* World, USoundBase* SoundCue, FVector NoiseLocation, float Loudness, AActor* Instigator, float MaxRange)
 {
-	UGameplayStatics::PlaySoundAtLocation(World, SoundCue, NoiseLocation);
+	UGameplayStatics::PlaySoundAtLocation(World, SoundCue, NoiseLocation, Loudness);
 	UAISense_Hearing::ReportNoiseEvent(World, NoiseLocation, Loudness, Instigator, MaxRange);
 	if (GShowSoundEvents == 0)
 	{

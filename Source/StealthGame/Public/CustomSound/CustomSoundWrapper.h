@@ -13,5 +13,5 @@ public:
 	CustomSoundWrapper();
 	~CustomSoundWrapper();
 
-	static void PlaySound(UWorld* World, USoundBase* SoundCue, FVector NoiseLocation, float Loudness, AActor* Instigator, float MaxRange);
+	static void PlaySoundAtLocation(UWorld* World, USoundBase* SoundCue, FVector NoiseLocation, float Loudness, AActor* Instigator, float MaxRange);
 };
