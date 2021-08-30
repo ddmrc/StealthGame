@@ -57,10 +57,14 @@ EBTNodeResult::Type UMyBTTask_MoveToLocation::ExecuteTask(UBehaviorTreeComponent
 
 void UMyBTTask_MoveToLocation::SelectTarget(UBehaviorTreeComponent& OwnerComp)
 {
+	if (!bMoveToScanned)
+	{
+		MoveToLocationList.Empty();
+	}
 	if (MoveToLocationList.Num() == 0)
 	{
 		UGameplayStatics::GetAllActorsOfClassWithTag(this, AMoveToLocationActor::StaticClass(), FName("Activated"), MoveToLocationList);
-
+		bMoveToScanned = true;
 	}
 
 

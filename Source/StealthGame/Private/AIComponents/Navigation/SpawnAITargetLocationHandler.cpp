@@ -42,7 +42,7 @@ void ASpawnAITargetLocationHandler::SpawnRandomSearchPoints(FVector CentralPoint
 
 	if (MyItemBlueprint)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("HELLO"));
+
 		AActor* NewActor = GetWorld()->SpawnActor(MyItemBlueprint, &SpawnCentralPoint, &Rotation);
 
 
@@ -50,7 +50,7 @@ void ASpawnAITargetLocationHandler::SpawnRandomSearchPoints(FVector CentralPoint
 
 		if (SurrondingNumberOfSpawnLocations > 0)
 		{
-			for (int i = 0; i < SurrondingNumberOfSpawnLocations; i++)
+			for (int i = 1; i < SurrondingNumberOfSpawnLocations; i++)
 			{
 				float LocationX = FMath::RandRange(0.f, Radius);
 				float LocationY = FMath::RandRange(0.f, Radius);
@@ -68,37 +68,25 @@ void ASpawnAITargetLocationHandler::SpawnRandomSearchPoints(FVector CentralPoint
 	}
 
 
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMoveToLocationActor::StaticClass(), WroldSearchMovingToList);
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AMoveToLocationActor::StaticClass(),FName("Activated"), WroldSearchMovingToList);
 
-	TArray <int32> IndexToRemove;
-
-	for (int i = 0; i < WroldSearchMovingToList.Num(); i++)
-	{
-		if (WroldSearchMovingToList.IsValidIndex(i) && WroldSearchMovingToList[i]->ActorHasTag(FName("Desactivated")))
-		{
-			IndexToRemove.Add(i);
-
-			WroldSearchMovingToList.RemoveAt(i,1, false);
-			
-		}
-	}
-	for (int i = 0; i < IndexToRemove.Num();i++)
-	{
-		WroldSearchMovingToList.RemoveAt(IndexToRemove[i], 1, true);
-	}
 
 }
 
 void ASpawnAITargetLocationHandler::RemoveRandomSearchPoints()
 {
-	for (int i = 0; i < WroldSearchMovingToList.Num() - 1; i++)
+	if (WroldSearchMovingToList.IsValidIndex(0))
 	{
-		if (WroldSearchMovingToList.IsValidIndex(i))
+		for (int i = 0; i < WroldSearchMovingToList.Num(); i++)
 		{
-			WroldSearchMovingToList[i]->Destroy();
+			if (WroldSearchMovingToList.IsValidIndex(i))
+			{
+				WroldSearchMovingToList[i]->Destroy();
 
+			}
 		}
 	}
+
 
 	ToggleAllPatrolMoveToPoints(true);
 }
@@ -120,6 +108,7 @@ void ASpawnAITargetLocationHandler::ToggleAllPatrolMoveToPoints(bool bAreActive)
 			{
 				WroldPatrolMovingToList[i]->SetActorTickEnabled(false);
 				WroldPatrolMovingToList[i]->SetActorEnableCollision(false);
+				WroldPatrolMovingToList[i]->Tags.Remove(FName("Activated"));
 				WroldPatrolMovingToList[i]->Tags.Add(FName("Deactivated"));
 			}
 		}
@@ -132,6 +121,7 @@ void ASpawnAITargetLocationHandler::ToggleAllPatrolMoveToPoints(bool bAreActive)
 			{
 				WroldPatrolMovingToList[i]->SetActorTickEnabled(true);
 				WroldPatrolMovingToList[i]->SetActorEnableCollision(true);
+				WroldPatrolMovingToList[i]->Tags.Remove(FName("Deactivated"));
 				WroldPatrolMovingToList[i]->Tags.Add(FName("Activated"));
 			}
 		}

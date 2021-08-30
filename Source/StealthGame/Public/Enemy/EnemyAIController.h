@@ -33,23 +33,29 @@ class STEALTHGAME_API AEnemyAIController : public AAIController
 	GENERATED_BODY()
 public:
 
+	bool bSearchPointsDeleted = true;
 
 	AMyPlayerCharacter* PlayerCharacter = nullptr;
 
 	UPROPERTY()
 	EAIStates CurrentAIState;
 
-	FTimerHandle ConfusedTimer;
+	FTimerHandle DetectedTimer;
+	FTimerHandle SearchTimer;
+	FTimerHandle PatrolTimer;
 	FTimerHandle LookAroundTimer;
 
 	FTimerDelegate TimerSearchingToPatrol;
 	FTimerDelegate TimerDetectedToChasing;
 	FTimerDelegate TimerDetectedToLookAround;
-	FTimerDelegate TimerConfusedToSearch;
+	FTimerDelegate TimerSearchToConfused;
 
 	FVector LastStimulusLocation = FVector::ZeroVector;
 
 	ASpawnAITargetLocationHandler* SpawnTargetLocationHandler = nullptr;
+
+	FAIStimulus AIStimulus;
+	EAIStates LastState;
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;

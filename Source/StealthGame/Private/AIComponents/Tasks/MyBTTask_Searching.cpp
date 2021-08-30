@@ -12,7 +12,7 @@
 
 UMyBTTask_Searching::UMyBTTask_Searching(const FObjectInitializer& objectInitializer)
 {
-	NodeName = "CustomMoveToLocation";
+	NodeName = "CustomSearching";
 	bNotifyTick = true;
 	bStopOnOverlap = false;
 }
@@ -58,42 +58,41 @@ EBTNodeResult::Type UMyBTTask_Searching::ExecuteTask(UBehaviorTreeComponent& Own
 
 void UMyBTTask_Searching::SelectTarget(UBehaviorTreeComponent& OwnerComp)
 {
+	if (!bMoveToScanned)
+	{
+		MoveToLocationList.Empty();
+	}
+
+	if (MoveToLocationList.Num() == 0)
+	{
+		UGameplayStatics::GetAllActorsOfClassWithTag(this, AMoveToLocationActor::StaticClass(), FName("Activated"), MoveToLocationList);
+		bMoveToScanned = true;
+	}
 
 
-	//OwnerComp.GetBlackboardComponent()->SetValueAsObject("MoveToLocation",)
+
+	if (MoveToLocationList.Num() > 0 && bIsMoveToLocationReached)
+	{
+		int RandomNumber = FMath::RandRange(0, MoveToLocationList.Num() - 1);
+
+		if (MoveToLocationList.IsValidIndex(RandomNumber))
+		{
+			CurrentMoveToTarget = MoveToLocationList[RandomNumber];
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject("MoveToLocation", MoveToLocationList[RandomNumber]);
+			bIsMoveToLocationReached = false;
+		}
+	}
+
+	if (CurrentMoveToTarget)
+	{
 
 
-	//if (MoveToLocationList.Num() == 0)
-	//{
-	//	UGameplayStatics::GetAllActorsOfClass(this, AMoveToLocationActor::StaticClass(), MoveToLocationList);
-
-	//}
+		if (OwnerComp.GetAIOwner()->GetCharacter()->GetActorLocation().Equals(CurrentMoveToTarget->GetActorLocation(), 50.f))
+		{
 
 
-
-	//if (MoveToLocationList.Num() > 0 && bIsMoveToLocationReached)
-	//{
-	//	int RandomNumber = FMath::RandRange(0, MoveToLocationList.Num() - 1);
-
-	//	if (MoveToLocationList.IsValidIndex(RandomNumber))
-	//	{
-
-	//		CurrentMoveToTarget = MoveToLocationList[RandomNumber];
-	//		OwnerComp.GetBlackboardComponent()->SetValueAsObject("MoveToLocation", MoveToLocationList[RandomNumber]);
-	//		bIsMoveToLocationReached = false;
-	//	}
-	//}
-
-	//if (CurrentMoveToTarget)
-	//{
-
-
-	//	if (OwnerComp.GetAIOwner()->GetCharacter()->GetActorLocation().Equals(CurrentMoveToTarget->GetActorLocation(), 50.f))
-	//	{
-
-
-	//		bIsMoveToLocationReached = true;
-	//	}
-	//}
+			bIsMoveToLocationReached = true;
+		}
+	}
 }
 

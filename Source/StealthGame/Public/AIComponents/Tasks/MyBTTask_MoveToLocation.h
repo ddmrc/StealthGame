@@ -32,5 +32,6 @@ protected:
 
 	AActor* CurrentMoveToTarget;
 	bool bIsMoveToLocationReached = true;
+	bool bMoveToScanned = false;
 
 };

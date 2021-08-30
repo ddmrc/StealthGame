@@ -40,7 +40,7 @@ void AEnemyAIController::BeginPlay()
 
 	//setting up timerhandle for this function
 	TimerSearchingToPatrol.BindUFunction(this, FName("SetAIState"), EAIStates::Patrol);
-	TimerConfusedToSearch.BindUFunction(this, FName("SetAIState"), EAIStates::Searching);
+	TimerSearchToConfused.BindUFunction(this, FName("SetAIState"), EAIStates::Confused);
 	TimerDetectedToChasing.BindUFunction(this, FName("SetAIState"), EAIStates::Chasing);
 	TimerDetectedToLookAround.BindUFunction(this, FName("SetAIState"), EAIStates::LookingAround);
 
@@ -56,7 +56,145 @@ void AEnemyAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	AILookAroundMechanic();
+	//AILookAroundMechanic();
+
+
+
+	if (CurrentAIState == EAIStates::Patrol)
+	{
+
+
+		LastState = EAIStates::Patrol;
+
+
+
+		if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Sight")
+		{
+			//LastStimulusLocation = AIStimulus->StimulusLocation;
+			SetAIState(EAIStates::Detected);
+
+
+		}
+
+		else if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Hearing")
+		{
+			//LastStimulusLocation = AIStimulus->StimulusLocation;
+			SetAIState(EAIStates::Searching);
+
+		}
+
+		if (!GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer))
+		{
+			float RandFloatLookAround = FMath::FRandRange(3.f, 5.f);
+			GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
+			GetWorld()->GetTimerManager().SetTimer(LookAroundTimer, TimerDetectedToLookAround, RandFloatLookAround, false);
+		}
+
+	}
+
+	else if (CurrentAIState == EAIStates::LookingAround)
+
+	{
+		if (AIStimulus.WasSuccessfullySensed())
+		{
+
+			SetAIState(EAIStates::Detected);
+
+		}
+		
+
+		if (!GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer))
+		{
+			GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
+			GetWorld()->GetTimerManager().SetTimer(LookAroundTimer, TimerSearchingToPatrol, 2.f, false);
+		}
+
+
+		
+	}
+
+	else if (CurrentAIState == EAIStates::Chasing)
+	{
+		if (!AIStimulus.IsActive())
+		{
+			SetAIState(EAIStates::Searching);
+
+		}
+
+
+		if (SpawnTargetLocationHandler && !bSearchPointsDeleted)
+		{
+			SpawnTargetLocationHandler->RemoveRandomSearchPoints();
+			bSearchPointsDeleted = true;
+		}
+	}
+
+	else if (CurrentAIState == EAIStates::Detected)
+	{
+		if (GetWorld()->GetTimerManager().IsTimerActive(SearchTimer))
+		{
+			GetWorld()->GetTimerManager().PauseTimer(SearchTimer);
+		}
+
+		if (GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer))
+		{
+			GetWorld()->GetTimerManager().PauseTimer(LookAroundTimer);
+		}
+		
+
+		if (!GetWorld()->GetTimerManager().IsTimerActive(DetectedTimer))
+		{
+			GetWorld()->GetTimerManager().ClearTimer(DetectedTimer);
+			GetWorld()->GetTimerManager().SetTimer(DetectedTimer, TimerDetectedToChasing, 1.0f, false);
+		}
+	}
+
+	else if (CurrentAIState == EAIStates::Confused)
+	{
+		if (!GetWorld()->GetTimerManager().IsTimerActive(SearchTimer))
+		{
+			GetWorld()->GetTimerManager().ClearTimer(SearchTimer);
+			GetWorld()->GetTimerManager().SetTimer(SearchTimer, TimerSearchingToPatrol, 2.0f, false);
+		}
+
+		if (SpawnTargetLocationHandler && !bSearchPointsDeleted)
+		{
+			SpawnTargetLocationHandler->RemoveRandomSearchPoints();
+			bSearchPointsDeleted = true;
+		}
+	}
+
+	else if (CurrentAIState == EAIStates::Searching)
+	{
+
+		if (!GetWorld()->GetTimerManager().IsTimerActive(PatrolTimer))
+		{
+			if (SpawnTargetLocationHandler)
+			{
+				float RadiusForPoints = 550.f;
+				int32 NumberOfPointsToSpawn = 2;
+				SpawnTargetLocationHandler->SpawnRandomSearchPoints(LastStimulusLocation, RadiusForPoints, NumberOfPointsToSpawn);
+				bSearchPointsDeleted = false;
+			}
+
+
+			GetWorld()->GetTimerManager().ClearTimer(PatrolTimer);
+			GetWorld()->GetTimerManager().SetTimer(PatrolTimer, TimerSearchToConfused, 5.0f, false);
+		}
+
+		if (AIStimulus.IsActive())
+		{
+
+			SetAIState(EAIStates::Detected);
+
+		}
+
+
+	}
+
+
+
+
 
 
 
@@ -68,66 +206,13 @@ void AEnemyAIController::Tick(float DeltaTime)
 void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
 
+		AIStimulus = Stimulus;
 
 
-	if (Stimulus.WasSuccessfullySensed() && Stimulus.Type.Name == "Default__AISense_Sight")
-	{
-	
-		LastStimulusLocation = Stimulus.StimulusLocation;
-
-		if (CurrentAIState == EAIStates::Patrol || CurrentAIState == EAIStates::Confused || CurrentAIState == EAIStates::Searching)
-		{
-			SetAIState(EAIStates::Detected);
-			GetWorld()->GetTimerManager().SetTimer(ConfusedTimer, TimerDetectedToChasing, 1.0f, false);
-		}
-
-	}
-	else if (Stimulus.WasSuccessfullySensed() && Stimulus.Type.Name == "Default__AISense_Hearing")
+	if (Stimulus.WasSuccessfullySensed())
 	{
 		LastStimulusLocation = Stimulus.StimulusLocation;
-
-		if (CurrentAIState == EAIStates::Patrol || CurrentAIState == EAIStates::Confused)
-		{
-			SetAIState(EAIStates::Searching);
-			GetWorld()->GetTimerManager().SetTimer(ConfusedTimer, TimerSearchingToPatrol, 5.0f, false);
-		}
 	}
-	else if (CurrentAIState == EAIStates::Chasing && !Stimulus.IsActive() )
-	{
-
-		SetAIState(EAIStates::Confused);
-
-
-		GetWorld()->GetTimerManager().SetTimer(ConfusedTimer, TimerConfusedToSearch, 2.0f, false);
-	
-		Stimulus.StimulusLocation; //THIS IS SEARCH POINT WHERE PLAYER WAS LOST
-		// Stay within radius of this location when searching for player.
-
-		//if you dont see player and timer is over then back to patrol
-		//else if you find player go chase
-		//MAKE SURE THE CHANGE FROM Search to Patrol is done within Tick since it wont work
-		//SPAWN AI to Location within radious of stimulus.StimulusLocation so the AI searches
-
-
-		//USE Stimulus.StimulusLocation ONLY when AI HEARS pleayer (on detection)
-
-
-	}
-	else
-	{
-		if (CurrentAIState != EAIStates::LookingAround)
-		{
-			SetAIState(EAIStates::Patrol);
-		}
-			
-
-
-
-
-		
-	}
-
-
 
 	
 }
@@ -149,11 +234,8 @@ void AEnemyAIController::SetAIState(EAIStates NewState)
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Player Detected"));
 			break;
 		case EAIStates::Patrol:
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player Hidden"));
-			if (SpawnTargetLocationHandler)
-			{
-				SpawnTargetLocationHandler->RemoveRandomSearchPoints();
-			}
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Patrolling"));
+
 			break;
 		case EAIStates::Chasing:
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Player Being Chasing"));
@@ -163,10 +245,6 @@ void AEnemyAIController::SetAIState(EAIStates NewState)
 			break;
 		case EAIStates::Searching:
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("AI Searching"));
-			if (SpawnTargetLocationHandler)
-			{
-				SpawnTargetLocationHandler->SpawnRandomSearchPoints(LastStimulusLocation, 500.f, 2);
-			}
 			break;
 		case EAIStates::LookingAround:
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::White, TEXT("AI Looking Around"));
@@ -183,37 +261,37 @@ EAIStates AEnemyAIController::RequestGetAIState()
 	return CurrentAIState;
 }
 
-void AEnemyAIController::AILookAroundMechanic()
-{
-	if (CurrentAIState == EAIStates::Patrol || CurrentAIState == EAIStates::LookingAround)
-	{
-		if (!GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer) && CurrentAIState == EAIStates::Patrol)
-		{
-
-			GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
-			float RandFloatLookAround = FMath::FRandRange(3.f, 5.f);
-			GetWorld()->GetTimerManager().SetTimer(LookAroundTimer, TimerDetectedToLookAround, RandFloatLookAround, false);
-
-		}
-		else if (!GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer) && CurrentAIState == EAIStates::LookingAround)
-		{
-			GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
-			GetWorld()->GetTimerManager().SetTimer(LookAroundTimer, TimerSearchingToPatrol, 2.f, false);
-		}
-
-		if (PerceptionComponent->HasAnyActiveStimulus(*PlayerCharacter))
-		{
-			SetAIState(EAIStates::Detected);
-			GetWorld()->GetTimerManager().SetTimer(ConfusedTimer, TimerDetectedToChasing, 1.0f, false);
-		}
-	}
-	else
-	{
-
-		GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
-	}
-
-
-
-
-}
+//void AEnemyAIController::AILookAroundMechanic()
+//{
+//	if (CurrentAIState == EAIStates::Patrol || CurrentAIState == EAIStates::LookingAround)
+//	{
+//		if (!GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer) && CurrentAIState == EAIStates::Patrol)
+//		{
+//
+//			GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
+//			float RandFloatLookAround = FMath::FRandRange(3.f, 5.f);
+//			GetWorld()->GetTimerManager().SetTimer(LookAroundTimer, TimerDetectedToLookAround, RandFloatLookAround, false);
+//
+//		}
+//		else if (!GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer) && CurrentAIState == EAIStates::LookingAround)
+//		{
+//			GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
+//			GetWorld()->GetTimerManager().SetTimer(LookAroundTimer, TimerSearchingToPatrol, 2.f, false);
+//		}
+//
+//		if (PerceptionComponent->HasAnyActiveStimulus(*PlayerCharacter))
+//		{
+//			SetAIState(EAIStates::Detected);
+//			GetWorld()->GetTimerManager().SetTimer(ConfusedTimer, TimerDetectedToChasing, 1.0f, false);
+//		}
+//	}
+//	else
+//	{
+//
+//		GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
+//	}
+//
+//
+//
+//
+//}

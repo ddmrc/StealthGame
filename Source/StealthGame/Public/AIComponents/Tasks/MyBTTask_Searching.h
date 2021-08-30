@@ -36,6 +36,7 @@ protected:
 	AActor* CurrentMoveToTarget;
 	FVector SearchPointLocation = FVector::ZeroVector;
 	bool bIsMoveToLocationReached = true;
+	bool bMoveToScanned = false;
 	void SelectTarget(UBehaviorTreeComponent& OwnerComp);
 
 };
