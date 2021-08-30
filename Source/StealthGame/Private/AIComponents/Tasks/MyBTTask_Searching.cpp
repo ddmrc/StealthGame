@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AIComponents/Tasks/MyBTTask_MoveToLocation.h"
+#include "AIComponents/Tasks/MyBTTask_Searching.h"
 #include "Kismet/GameplayStatics.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
@@ -10,14 +10,14 @@
 
 
 
-UMyBTTask_MoveToLocation::UMyBTTask_MoveToLocation(const FObjectInitializer& objectInitializer)
+UMyBTTask_Searching::UMyBTTask_Searching(const FObjectInitializer& objectInitializer)
 {
 	NodeName = "CustomMoveToLocation";
 	bNotifyTick = true;
 	bStopOnOverlap = false;
 }
 
-EBTNodeResult::Type UMyBTTask_MoveToLocation::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+EBTNodeResult::Type UMyBTTask_Searching::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	//Super::ExecuteTask(OwnerComp, NodeMemory);
 	EBTNodeResult::Type NodeResult = EBTNodeResult::InProgress;
@@ -55,54 +55,45 @@ EBTNodeResult::Type UMyBTTask_MoveToLocation::ExecuteTask(UBehaviorTreeComponent
 }
 
 
-void UMyBTTask_MoveToLocation::SelectTarget(UBehaviorTreeComponent& OwnerComp)
+
+void UMyBTTask_Searching::SelectTarget(UBehaviorTreeComponent& OwnerComp)
 {
-	if (MoveToLocationList.Num() == 0)
-	{
-		UGameplayStatics::GetAllActorsOfClassWithTag(this, AMoveToLocationActor::StaticClass(), FName("Activated"), MoveToLocationList);
-
-	}
 
 
-
-	if (MoveToLocationList.Num() > 0 && bIsMoveToLocationReached)
-	{
-		int RandomNumber = FMath::RandRange(0, MoveToLocationList.Num() - 1);
-
-		if (MoveToLocationList.IsValidIndex(RandomNumber))
-		{
-			CurrentMoveToTarget = MoveToLocationList[RandomNumber];
-			OwnerComp.GetBlackboardComponent()->SetValueAsObject("MoveToLocation", MoveToLocationList[RandomNumber]);
-			bIsMoveToLocationReached = false;
-		}
-	}
-
-	if (CurrentMoveToTarget)
-	{
+	//OwnerComp.GetBlackboardComponent()->SetValueAsObject("MoveToLocation",)
 
 
-		if (OwnerComp.GetAIOwner()->GetCharacter()->GetActorLocation().Equals(CurrentMoveToTarget->GetActorLocation(), 50.f))
-		{
+	//if (MoveToLocationList.Num() == 0)
+	//{
+	//	UGameplayStatics::GetAllActorsOfClass(this, AMoveToLocationActor::StaticClass(), MoveToLocationList);
+
+	//}
 
 
-			bIsMoveToLocationReached = true;
-		}
-	}
+
+	//if (MoveToLocationList.Num() > 0 && bIsMoveToLocationReached)
+	//{
+	//	int RandomNumber = FMath::RandRange(0, MoveToLocationList.Num() - 1);
+
+	//	if (MoveToLocationList.IsValidIndex(RandomNumber))
+	//	{
+
+	//		CurrentMoveToTarget = MoveToLocationList[RandomNumber];
+	//		OwnerComp.GetBlackboardComponent()->SetValueAsObject("MoveToLocation", MoveToLocationList[RandomNumber]);
+	//		bIsMoveToLocationReached = false;
+	//	}
+	//}
+
+	//if (CurrentMoveToTarget)
+	//{
+
+
+	//	if (OwnerComp.GetAIOwner()->GetCharacter()->GetActorLocation().Equals(CurrentMoveToTarget->GetActorLocation(), 50.f))
+	//	{
+
+
+	//		bIsMoveToLocationReached = true;
+	//	}
+	//}
 }
-
-//EBTNodeResult::Type UMyBTTask_MoveToLocation::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
-//{
-//	Super::AbortTask(OwnerComp, NodeMemory);
-//
-//	UE_LOG(LogTemp, Warning, TEXT("ABORT"));
-//
-//	return EBTNodeResult::Aborted;
-//}
-//
-//void UMyBTTask_MoveToLocation::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
-//{
-//	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
-//	UE_LOG(LogTemp, Warning, TEXT("TICK"));
-//}
-
 

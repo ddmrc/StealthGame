@@ -6,6 +6,8 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Enum.h"
+#include "AIComponents/Tasks/MyBTTask_Searching.h"
+
 
 void AEnemyAIController::BeginPlay()
 {
@@ -18,6 +20,17 @@ void AEnemyAIController::BeginPlay()
 		PlayerCharacter = Cast<AMyPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	}
 
+	if (SpawnTargetLocationHandler == nullptr)
+	{
+		TArray <AActor*> Arr;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASpawnAITargetLocationHandler::StaticClass(), Arr);
+
+		if (Arr.IsValidIndex(0))
+		{
+			SpawnTargetLocationHandler = Cast< ASpawnAITargetLocationHandler>(Arr[0]);
+		}
+	}
+
 
 	if (UAIPerceptionComponent* ThisPerceptionComponent = GetPerceptionComponent())
 	{
@@ -26,7 +39,8 @@ void AEnemyAIController::BeginPlay()
 	}
 
 	//setting up timerhandle for this function
-	TimerConfusedToPatrol.BindUFunction(this, FName("SetAIState"), EAIStates::Patrol);
+	TimerSearchingToPatrol.BindUFunction(this, FName("SetAIState"), EAIStates::Patrol);
+	TimerConfusedToSearch.BindUFunction(this, FName("SetAIState"), EAIStates::Searching);
 	TimerDetectedToChasing.BindUFunction(this, FName("SetAIState"), EAIStates::Chasing);
 	TimerDetectedToLookAround.BindUFunction(this, FName("SetAIState"), EAIStates::LookingAround);
 
@@ -56,22 +70,47 @@ void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stim
 
 
 
-	if (Stimulus.WasSuccessfullySensed() )
+	if (Stimulus.WasSuccessfullySensed() && Stimulus.Type.Name == "Default__AISense_Sight")
 	{
+	
+		LastStimulusLocation = Stimulus.StimulusLocation;
 
-		if (CurrentAIState == EAIStates::Patrol || CurrentAIState == EAIStates::Confused)
+		if (CurrentAIState == EAIStates::Patrol || CurrentAIState == EAIStates::Confused || CurrentAIState == EAIStates::Searching)
 		{
 			SetAIState(EAIStates::Detected);
 			GetWorld()->GetTimerManager().SetTimer(ConfusedTimer, TimerDetectedToChasing, 1.0f, false);
 		}
 
 	}
-	else if (!Stimulus.IsActive() && CurrentAIState == EAIStates::Chasing)
+	else if (Stimulus.WasSuccessfullySensed() && Stimulus.Type.Name == "Default__AISense_Hearing")
+	{
+		LastStimulusLocation = Stimulus.StimulusLocation;
+
+		if (CurrentAIState == EAIStates::Patrol || CurrentAIState == EAIStates::Confused)
+		{
+			SetAIState(EAIStates::Searching);
+			GetWorld()->GetTimerManager().SetTimer(ConfusedTimer, TimerSearchingToPatrol, 5.0f, false);
+		}
+	}
+	else if (CurrentAIState == EAIStates::Chasing && !Stimulus.IsActive() )
 	{
 
 		SetAIState(EAIStates::Confused);
 
-		GetWorld()->GetTimerManager().SetTimer(ConfusedTimer, TimerConfusedToPatrol, 2.0f, false);
+
+		GetWorld()->GetTimerManager().SetTimer(ConfusedTimer, TimerConfusedToSearch, 2.0f, false);
+	
+		Stimulus.StimulusLocation; //THIS IS SEARCH POINT WHERE PLAYER WAS LOST
+		// Stay within radius of this location when searching for player.
+
+		//if you dont see player and timer is over then back to patrol
+		//else if you find player go chase
+		//MAKE SURE THE CHANGE FROM Search to Patrol is done within Tick since it wont work
+		//SPAWN AI to Location within radious of stimulus.StimulusLocation so the AI searches
+
+
+		//USE Stimulus.StimulusLocation ONLY when AI HEARS pleayer (on detection)
+
 
 	}
 	else
@@ -111,6 +150,10 @@ void AEnemyAIController::SetAIState(EAIStates NewState)
 			break;
 		case EAIStates::Patrol:
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Player Hidden"));
+			if (SpawnTargetLocationHandler)
+			{
+				SpawnTargetLocationHandler->RemoveRandomSearchPoints();
+			}
 			break;
 		case EAIStates::Chasing:
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Player Being Chasing"));
@@ -120,6 +163,10 @@ void AEnemyAIController::SetAIState(EAIStates NewState)
 			break;
 		case EAIStates::Searching:
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("AI Searching"));
+			if (SpawnTargetLocationHandler)
+			{
+				SpawnTargetLocationHandler->SpawnRandomSearchPoints(LastStimulusLocation, 500.f, 2);
+			}
 			break;
 		case EAIStates::LookingAround:
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::White, TEXT("AI Looking Around"));
@@ -151,7 +198,7 @@ void AEnemyAIController::AILookAroundMechanic()
 		else if (!GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer) && CurrentAIState == EAIStates::LookingAround)
 		{
 			GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
-			GetWorld()->GetTimerManager().SetTimer(LookAroundTimer, TimerConfusedToPatrol, 2.f, false);
+			GetWorld()->GetTimerManager().SetTimer(LookAroundTimer, TimerSearchingToPatrol, 2.f, false);
 		}
 
 		if (PerceptionComponent->HasAnyActiveStimulus(*PlayerCharacter))

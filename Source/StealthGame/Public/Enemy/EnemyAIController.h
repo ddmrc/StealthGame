@@ -2,11 +2,14 @@
 
 #pragma once
 
+
 #include "CoreMinimal.h"
 #include "AIController.h"
 #include "Perception/AIPerceptionTypes.h"
 #include "Player/MyPlayerCharacter.h"
+#include "AIComponents/Navigation/SpawnAITargetLocationHandler.h"
 #include "EnemyAIController.generated.h"
+
 
 /**
  * 
@@ -39,9 +42,14 @@ public:
 	FTimerHandle ConfusedTimer;
 	FTimerHandle LookAroundTimer;
 
-	FTimerDelegate TimerConfusedToPatrol;
+	FTimerDelegate TimerSearchingToPatrol;
 	FTimerDelegate TimerDetectedToChasing;
 	FTimerDelegate TimerDetectedToLookAround;
+	FTimerDelegate TimerConfusedToSearch;
+
+	FVector LastStimulusLocation = FVector::ZeroVector;
+
+	ASpawnAITargetLocationHandler* SpawnTargetLocationHandler = nullptr;
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
