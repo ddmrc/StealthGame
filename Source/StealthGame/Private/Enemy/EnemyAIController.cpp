@@ -65,26 +65,41 @@ void AEnemyAIController::Tick(float DeltaTime)
 
 
 		LastState = EAIStates::Patrol;
-
+		
 
 
 		if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Sight")
 		{
 			//LastStimulusLocation = AIStimulus->StimulusLocation;
+			GetWorld()->GetTimerManager().PauseTimer(LookAroundTimer);
 			SetAIState(EAIStates::Detected);
-
+			UE_LOG(LogTemp, Warning, TEXT("Detected"));
+			return;
 
 		}
 
 		else if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Hearing")
 		{
 			//LastStimulusLocation = AIStimulus->StimulusLocation;
+			GetWorld()->GetTimerManager().PauseTimer(LookAroundTimer);
+
+			if (SpawnTargetLocationHandler)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("SpawningCubes"));
+				float RadiusForPoints = 550.f;
+				int32 NumberOfPointsToSpawn = 2;
+				SpawnTargetLocationHandler->SpawnRandomSearchPoints(LastStimulusLocation, RadiusForPoints, NumberOfPointsToSpawn);
+				bSearchPointsDeleted = false;
+			}
+			GetWorld()->GetTimerManager().PauseTimer(PatrolTimer);
 			SetAIState(EAIStates::Searching);
+			return;
 
 		}
 
 		if (!GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer))
 		{
+			UE_LOG(LogTemp, Warning, TEXT("PATROLLING"));
 			float RandFloatLookAround = FMath::FRandRange(3.f, 5.f);
 			GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
 			GetWorld()->GetTimerManager().SetTimer(LookAroundTimer, TimerDetectedToLookAround, RandFloatLookAround, false);
@@ -95,25 +110,38 @@ void AEnemyAIController::Tick(float DeltaTime)
 	else if (CurrentAIState == EAIStates::Searching)
 	{
 
+		//IF Noise Strength is 1 then radius is more specifc if it's weaker radius is wider
+		//Also keep into account
 		if (!GetWorld()->GetTimerManager().IsTimerActive(PatrolTimer))
 		{
-			if (SpawnTargetLocationHandler)
-			{
-				float RadiusForPoints = 550.f;
-				int32 NumberOfPointsToSpawn = 2;
-				SpawnTargetLocationHandler->SpawnRandomSearchPoints(LastStimulusLocation, RadiusForPoints, NumberOfPointsToSpawn);
-				bSearchPointsDeleted = false;
-			}
 
 
 			GetWorld()->GetTimerManager().ClearTimer(PatrolTimer);
 			GetWorld()->GetTimerManager().SetTimer(PatrolTimer, TimerSearchToConfused, 5.0f, false);
 		}
 
-		if (AIStimulus.IsActive())
+		if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Sight")
+		{
+			//LastStimulusLocation = AIStimulus->StimulusLocation;
+			SetAIState(EAIStates::Detected);
+			UE_LOG(LogTemp, Warning, TEXT("SENSED"));
+			
+			
+		}
+
+		else if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Hearing")
 		{
 
-		SetAIState(EAIStates::Detected);
+			//if (SpawnTargetLocationHandler)
+			//{
+			//	UE_LOG(LogTemp, Warning, TEXT("SpawningCubes"));
+			//	float RadiusForPoints = 550.f;
+			//	int32 NumberOfPointsToSpawn = 2;
+			//	SpawnTargetLocationHandler->SpawnRandomSearchPoints(LastStimulusLocation, RadiusForPoints, NumberOfPointsToSpawn);
+			//	bSearchPointsDeleted = false;
+			//}
+			
+		
 
 		}
 
@@ -123,19 +151,38 @@ void AEnemyAIController::Tick(float DeltaTime)
 	else if (CurrentAIState == EAIStates::LookingAround)
 
 	{
-		if (AIStimulus.WasSuccessfullySensed())
-		{
 
-			SetAIState(EAIStates::Detected);
-
-		}
-		
 
 		if (!GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer))
 		{
 			GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
 			GetWorld()->GetTimerManager().SetTimer(LookAroundTimer, TimerSearchingToPatrol, 2.f, false);
 		}
+
+
+		if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Sight")
+		{
+
+			SetAIState(EAIStates::Detected);
+
+		}
+		else if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Hearing")
+		{
+
+			if (SpawnTargetLocationHandler)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("SpawningCubes"));
+				float RadiusForPoints = 550.f;
+				int32 NumberOfPointsToSpawn = 2;
+				SpawnTargetLocationHandler->SpawnRandomSearchPoints(LastStimulusLocation, RadiusForPoints, NumberOfPointsToSpawn);
+				bSearchPointsDeleted = false;
+			}
+
+			GetWorld()->GetTimerManager().PauseTimer(PatrolTimer);
+			SetAIState(EAIStates::Searching);
+
+		}
+
 
 
 		
@@ -145,16 +192,23 @@ void AEnemyAIController::Tick(float DeltaTime)
 	{
 		if (!AIStimulus.IsActive())
 		{
+
+
+			if (SpawnTargetLocationHandler)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("SpawningCubes"));
+				float RadiusForPoints = 550.f;
+				int32 NumberOfPointsToSpawn = 2;
+				SpawnTargetLocationHandler->SpawnRandomSearchPoints(LastStimulusLocation, RadiusForPoints, NumberOfPointsToSpawn);
+				bSearchPointsDeleted = false;
+			}
+			GetWorld()->GetTimerManager().PauseTimer(PatrolTimer);
 			SetAIState(EAIStates::Searching);
 
 		}
 
 
-		if (SpawnTargetLocationHandler && !bSearchPointsDeleted)
-		{
-			SpawnTargetLocationHandler->RemoveRandomSearchPoints();
-			bSearchPointsDeleted = true;
-		}
+
 	}
 
 	else if (CurrentAIState == EAIStates::Detected)
@@ -182,13 +236,15 @@ void AEnemyAIController::Tick(float DeltaTime)
 		if (!GetWorld()->GetTimerManager().IsTimerActive(SearchTimer))
 		{
 			GetWorld()->GetTimerManager().ClearTimer(SearchTimer);
-			GetWorld()->GetTimerManager().SetTimer(SearchTimer, TimerSearchingToPatrol, 2.0f, false);
+			GetWorld()->GetTimerManager().SetTimer(SearchTimer, TimerSearchingToPatrol, 2.0f, false, - 1.f);
+			UE_LOG(LogTemp, Warning, TEXT("CONSFUSED"));
 		}
 
 		if (SpawnTargetLocationHandler && !bSearchPointsDeleted)
 		{
 			SpawnTargetLocationHandler->RemoveRandomSearchPoints();
 			bSearchPointsDeleted = true;
+			UE_LOG(LogTemp, Warning, TEXT("Deleting Cubes"));
 		}
 	}
 	
@@ -227,7 +283,6 @@ void AEnemyAIController::SetAIState(EAIStates NewState)
 			break;
 		case EAIStates::Patrol:
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Patrolling"));
-
 			break;
 		case EAIStates::Chasing:
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Player Being Chasing"));

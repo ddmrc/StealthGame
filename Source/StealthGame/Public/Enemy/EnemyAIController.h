@@ -35,6 +35,8 @@ public:
 
 	bool bSearchPointsDeleted = true;
 
+
+
 	AMyPlayerCharacter* PlayerCharacter = nullptr;
 
 	UPROPERTY()

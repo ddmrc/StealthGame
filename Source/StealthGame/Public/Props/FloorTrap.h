@@ -24,6 +24,8 @@ public:
 	float MaxSoundDistanceDetection = 1000.f;
 	UPROPERTY(EditAnywhere)
 	float SoundVolumeMultiplier = 1.f;
+	UPROPERTY(EditAnywhere)
+	bool bOnlyTriggersOnce = true;
 protected:
 
 

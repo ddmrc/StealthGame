@@ -49,7 +49,11 @@ void AFloorTrap::NotifyActorBeginOverlap(AActor* OtherActor)
 		//UAISense_Hearing::ReportNoiseEvent(GetWorld(), GetActorLocation(), 1.f, OtherActor, MaxSoundDistanceDetection);
 		
 		CustomSoundWrapper::PlaySoundAtLocation(GetWorld(), SoundEffect, GetActorLocation(), SoundVolumeMultiplier, OtherActor, MaxSoundDistanceDetection);
-		bIsActive = false;
+		if (bOnlyTriggersOnce)
+		{
+			bIsActive = false;
+		}
+		
 	}
 
 }
