@@ -29,15 +29,15 @@ EBTNodeResult::Type UMyBTTask_Searching::ExecuteTask(UBehaviorTreeComponent& Own
 	MyMemory->PreviousGoalLocation = FAISystem::InvalidLocation;
 	MyMemory->MoveRequestID = FAIRequestID::InvalidRequest;
 
-	//bMoveToScanned = false;
-
 	AAIController* MyController = OwnerComp.GetAIOwner();
 	MyMemory->bWaitingForPath = bUseGameplayTasks ? false : MyController->ShouldPostponePathUpdates();
 	if (!MyMemory->bWaitingForPath)
 	{
-		
+
+
 		NodeResult = PerformMoveTask(OwnerComp, NodeMemory);
 	}
+
 
 
 	if (NodeResult == EBTNodeResult::InProgress && bObserveBlackboardValue)
@@ -62,10 +62,10 @@ EBTNodeResult::Type UMyBTTask_Searching::ExecuteTask(UBehaviorTreeComponent& Own
 void UMyBTTask_Searching::SelectTarget(UBehaviorTreeComponent& OwnerComp)
 {
 
-	if (!bMoveToScanned)
-	{
+
 		MoveToLocationList.Empty();
-	}
+
+	
 
 
 	if (MoveToLocationList.Num() == 0)
@@ -82,7 +82,7 @@ void UMyBTTask_Searching::SelectTarget(UBehaviorTreeComponent& OwnerComp)
 		
 		int RandomNumber = FMath::RandRange(0, MoveToLocationList.Num() - 1);
 
-		if (MoveToLocationList.IsValidIndex(RandomNumber))
+		if (MoveToLocationList.IsValidIndex(RandomNumber) )
 		{
 			//UE_LOG(LogTemp, Warning, TEXT("Selecting Search Location"));
 			CurrentMoveToTarget = MoveToLocationList[RandomNumber];

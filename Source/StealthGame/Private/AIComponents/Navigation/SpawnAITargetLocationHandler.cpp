@@ -50,15 +50,22 @@ void ASpawnAITargetLocationHandler::SpawnRandomSearchPoints(FVector CentralPoint
 
 		if (SurrondingNumberOfSpawnLocations > 0)
 		{
-			for (int i = 1; i < SurrondingNumberOfSpawnLocations; i++)
+			for (int i = 1; i < SurrondingNumberOfSpawnLocations+1; i++)
 			{
-				float LocationX = FMath::RandRange(0.f, Radius);
-				float LocationY = FMath::RandRange(0.f, Radius);
+				float LocationX = 0.f;
+				float LocationY = 0.f;
 
+				if (i > 1)
+				{
+					LocationX = FMath::RandRange(5.f, Radius);
+					LocationY = FMath::RandRange(5.f, Radius);
+
+				}
 
 				const FVector SpawnLocation = FVector(SpawnCentralPoint.X + LocationX, SpawnCentralPoint.Y + LocationY, SpawnCentralPoint.Z);
 
 				NewActor = GetWorld()->SpawnActor(MyItemBlueprint, &SpawnLocation, &Rotation);
+
 			}
 		}
 	}

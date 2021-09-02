@@ -35,6 +35,7 @@ public:
 
 	bool bSearchPointsDeleted = true;
 
+	bool DebugLogText = false;
 
 
 	AMyPlayerCharacter* PlayerCharacter = nullptr;
@@ -68,10 +69,15 @@ public:
 	UFUNCTION()
 	void SetAIState(EAIStates NewState);
 
+
+
+
+
 	UFUNCTION()
 	EAIStates RequestGetAIState();
 
-
-
+protected:
+	UFUNCTION()
+	void StartSearch(FAIStimulus Stimulus, bool DebugLog);
 
 };

@@ -33,8 +33,10 @@ EBTNodeResult::Type UMyBTTask_MoveToLocation::ExecuteTask(UBehaviorTreeComponent
 	MyMemory->bWaitingForPath = bUseGameplayTasks ? false : MyController->ShouldPostponePathUpdates();
 	if (!MyMemory->bWaitingForPath)
 	{
+		bIsMoveToLocationReached = true;
 		NodeResult = PerformMoveTask(OwnerComp, NodeMemory);
 	}
+
 
 
 	if (NodeResult == EBTNodeResult::InProgress && bObserveBlackboardValue)
@@ -73,7 +75,7 @@ void UMyBTTask_MoveToLocation::SelectTarget(UBehaviorTreeComponent& OwnerComp)
 	{
 		int RandomNumber = FMath::RandRange(0, MoveToLocationList.Num() - 1);
 
-		if (MoveToLocationList.IsValidIndex(RandomNumber))
+		if (MoveToLocationList.IsValidIndex(RandomNumber) && bIsMoveToLocationReached)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Selecting Patrol Location"));
 			CurrentMoveToTarget = MoveToLocationList[RandomNumber];
