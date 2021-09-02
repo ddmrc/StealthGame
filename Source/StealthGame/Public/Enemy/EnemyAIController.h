@@ -69,7 +69,7 @@ public:
 	UFUNCTION()
 	EAIStates RequestGetAIState();
 
-	void AILookAroundMechanic();
+
 
 
 };
