@@ -35,6 +35,9 @@ public:
 
 	bool bSearchPointsDeleted = true;
 
+
+
+	UPROPERTY(EditAnywhere)
 	bool DebugLogText = false;
 
 

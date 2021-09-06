@@ -59,7 +59,7 @@ void AEnemyAIController::Tick(float DeltaTime)
 
 	//AILookAroundMechanic();
 
-
+	//UE_LOG(LogTemp, Warning, TEXT("AgeStimulus: %s"), *FString::SanitizeFloat(AIStimulus.GetAge()));
 
 	if (CurrentAIState == EAIStates::Patrol)
 	{
@@ -87,7 +87,6 @@ void AEnemyAIController::Tick(float DeltaTime)
 
 		if (!GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("PATROLLING"));
 			float RandFloatLookAround = FMath::FRandRange(3.f, 5.f);
 			GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
 			GetWorld()->GetTimerManager().SetTimer(LookAroundTimer, TimerDetectedToLookAround, RandFloatLookAround, false);
@@ -100,37 +99,27 @@ void AEnemyAIController::Tick(float DeltaTime)
 
 		//IF Noise Strength is 1 then radius is more specifc if it's weaker radius is wider
 		//Also keep into account
-		if (!GetWorld()->GetTimerManager().IsTimerActive(PatrolTimer))
-		{
 
 
-			GetWorld()->GetTimerManager().ClearTimer(PatrolTimer);
-			GetWorld()->GetTimerManager().SetTimer(PatrolTimer, TimerSearchToConfused, 5.0f, false);
-		}
 
 		if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Sight")
 		{
 			//LastStimulusLocation = AIStimulus->StimulusLocation;
 			SetAIState(EAIStates::Detected);
-			UE_LOG(LogTemp, Warning, TEXT("SENSED"));
 			
 			
 		}
 
 		else if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Hearing")
 		{
-			// NEED TO MAKE IT RESET LOCATION AND TIMER ONLY but not do it first time around
-
-			//if (SpawnTargetLocationHandler)
-			//{
-			//	UE_LOG(LogTemp, Warning, TEXT("SpawningCubes"));
-			//	float RadiusForPoints = 550.f;
-			//	int32 NumberOfPointsToSpawn = 2;
-			//	SpawnTargetLocationHandler->SpawnRandomSearchPoints(LastStimulusLocation, RadiusForPoints, NumberOfPointsToSpawn);
-			//	bSearchPointsDeleted = false;
-			//}
 			
-		
+			//Need to set this so it triggers only when SitmulusLocation is updated
+			//Because player has made sound elsewhere
+			UE_LOG(LogTemp, Warning, TEXT("HERE"));
+			SpawnTargetLocationHandler->RemoveRandomSearchPoints();
+			bSearchPointsDeleted = true;
+			StartSearch(AIStimulus, DebugLogText);
+
 
 		}
 
@@ -168,6 +157,14 @@ void AEnemyAIController::Tick(float DeltaTime)
 
 	else if (CurrentAIState == EAIStates::Chasing)
 	{
+
+
+		if (GetWorld()->GetTimerManager().IsTimerActive(PatrolTimer))
+		{
+			GetWorld()->GetTimerManager().PauseTimer(PatrolTimer);
+		}
+	
+
 		if (!AIStimulus.IsActive())
 		{
 			StartSearch(AIStimulus, DebugLogText);
@@ -204,14 +201,12 @@ void AEnemyAIController::Tick(float DeltaTime)
 		{
 			GetWorld()->GetTimerManager().ClearTimer(SearchTimer);
 			GetWorld()->GetTimerManager().SetTimer(SearchTimer, TimerSearchingToPatrol, 2.0f, false, - 1.f);
-			UE_LOG(LogTemp, Warning, TEXT("CONSFUSED"));
 		}
 
 		if (SpawnTargetLocationHandler && !bSearchPointsDeleted)
 		{
 			SpawnTargetLocationHandler->RemoveRandomSearchPoints();
 			bSearchPointsDeleted = true;
-			UE_LOG(LogTemp, Warning, TEXT("Deleting Cubes"));
 		}
 	}
 	
@@ -221,14 +216,10 @@ void AEnemyAIController::Tick(float DeltaTime)
 void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
 
-		AIStimulus = Stimulus;
+	AIStimulus = Stimulus;
 
-
-	if (Stimulus.WasSuccessfullySensed())
-	{
-		LastStimulusLocation = Stimulus.StimulusLocation;
-	}
-
+	LastStimulusLocation = Stimulus.StimulusLocation;
+	
 	
 }
 
@@ -287,16 +278,20 @@ void AEnemyAIController::StartSearch(FAIStimulus Stimulus, bool DebugLog)
 	float RadiusForPoints = 250.f;
 	int32 NumberOfPointsToSpawn = 2;
 
+	float TimerToConfusedSeconds = 5.f;
+
 
 	if (Distance >= 1000.f)
 	{
 		RadiusForPoints = 550.f;
 		NumberOfPointsToSpawn = 4;
+		TimerToConfusedSeconds = 10.f;
 	}
 	else if (Distance < 999.f && Distance > 400.f)
 	{
 		RadiusForPoints = 350.f;
 		NumberOfPointsToSpawn = 3;
+		TimerToConfusedSeconds = 7.f;
 	}
 
 	RadiusForPoints = RadiusForPoints + (StimulusStrenght*200);
@@ -308,8 +303,10 @@ void AEnemyAIController::StartSearch(FAIStimulus Stimulus, bool DebugLog)
 		UE_LOG(LogTemp, Warning, TEXT("Stimulus Strenght: %s"), *FString::SanitizeFloat(StimulusStrenght));
 		UE_LOG(LogTemp, Warning, TEXT("RadiusForPoints: %s"), *FString::SanitizeFloat(RadiusForPoints));
 		UE_LOG(LogTemp, Warning, TEXT("NumberOfPointsToSpawn: %s"), *FString::FromInt(NumberOfPointsToSpawn));
+		UE_LOG(LogTemp, Warning, TEXT("SecondsToConfused: %s"), *FString::SanitizeFloat(TimerToConfusedSeconds));
+		DrawDebugSphere(GetWorld(), StimulusLocation, RadiusForPoints, 24, FColor::Blue, false, 5.f);
 	}
-	DrawDebugSphere(GetWorld(), StimulusLocation, RadiusForPoints, 24, FColor::Blue, false, 5.f);
+
 	
 
 
@@ -322,5 +319,12 @@ void AEnemyAIController::StartSearch(FAIStimulus Stimulus, bool DebugLog)
 	}
 	GetWorld()->GetTimerManager().PauseTimer(PatrolTimer);
 	SetAIState(EAIStates::Searching);
+
+	if (!GetWorld()->GetTimerManager().IsTimerActive(PatrolTimer))
+	{
+
+		GetWorld()->GetTimerManager().ClearTimer(PatrolTimer);
+		GetWorld()->GetTimerManager().SetTimer(PatrolTimer, TimerSearchToConfused, TimerToConfusedSeconds, false);
+	}
 
 }
