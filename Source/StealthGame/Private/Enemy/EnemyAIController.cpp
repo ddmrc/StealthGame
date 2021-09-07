@@ -126,7 +126,7 @@ void AEnemyAIController::Tick(float DeltaTime)
 
 		if (TargetMoveLocation && GetCharacter()->GetActorLocation().Equals(TargetMoveLocation->GetActorLocation(), 50.f))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Arrived"));
+			//UE_LOG(LogTemp, Warning, TEXT("Arrived"));
 			//CurrentAIState = EAIStates::LookingAround;
 			//bAIHasArrivedSearchLocation = false;
 		}
@@ -173,8 +173,14 @@ void AEnemyAIController::Tick(float DeltaTime)
 		}
 	
 
-		if (!AIStimulus.IsActive())
+		if (AIStimulus.IsExpired() )
 		{
+			if (SpawnTargetLocationHandler)
+			{
+				//UE_LOG(LogTemp, Warning, TEXT("Searching"));
+				SpawnTargetLocationHandler->RemoveRandomSearchPoints();
+			}
+
 			StartSearch(AIStimulus, DebugLogText);
 
 		}

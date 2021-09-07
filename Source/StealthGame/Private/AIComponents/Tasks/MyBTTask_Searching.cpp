@@ -93,7 +93,7 @@ void UMyBTTask_Searching::SelectTarget(UBehaviorTreeComponent& OwnerComp)
 			if (AIController)
 			{
 				AIController->TargetMoveLocation = MoveToLocationList[RandomNumber];
-				UE_LOG(LogTemp, Warning, TEXT("MoveTo Located"));
+				//UE_LOG(LogTemp, Warning, TEXT("MoveTo Located"));
 			}
 		}
 		else
@@ -109,7 +109,7 @@ void UMyBTTask_Searching::SelectTarget(UBehaviorTreeComponent& OwnerComp)
 		if (OwnerComp.GetAIOwner()->GetCharacter()->GetActorLocation().Equals(CurrentMoveToTarget->GetActorLocation(), 50.f))
 		{
 
-
+			UE_LOG(LogTemp, Warning, TEXT("Arrived"));
 			bIsMoveToLocationReached = true;
 		}
 	}
