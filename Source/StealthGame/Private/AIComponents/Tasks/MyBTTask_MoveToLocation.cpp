@@ -77,7 +77,7 @@ void UMyBTTask_MoveToLocation::SelectTarget(UBehaviorTreeComponent& OwnerComp)
 
 		if (MoveToLocationList.IsValidIndex(RandomNumber) && bIsMoveToLocationReached)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Selecting Patrol Location"));
+			//UE_LOG(LogTemp, Warning, TEXT("Selecting Patrol Location"));
 			CurrentMoveToTarget = MoveToLocationList[RandomNumber];
 			OwnerComp.GetBlackboardComponent()->SetValueAsObject("MoveToLocation", MoveToLocationList[RandomNumber]);
 			bIsMoveToLocationReached = false;

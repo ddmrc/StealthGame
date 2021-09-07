@@ -34,6 +34,8 @@ class STEALTHGAME_API AEnemyAIController : public AAIController
 public:
 
 	bool bSearchPointsDeleted = true;
+	bool bSearchPointNeedsUpdate= false;
+
 
 
 
@@ -62,6 +64,8 @@ public:
 
 	FAIStimulus AIStimulus;
 	EAIStates LastState;
+
+	AActor* TargetMoveLocation = nullptr;
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;

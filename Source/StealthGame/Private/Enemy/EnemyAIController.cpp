@@ -110,17 +110,25 @@ void AEnemyAIController::Tick(float DeltaTime)
 			
 		}
 
-		else if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Hearing")
+		else if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Hearing" && bSearchPointNeedsUpdate)
 		{
 			
 			//Need to set this so it triggers only when SitmulusLocation is updated
 			//Because player has made sound elsewhere
-			UE_LOG(LogTemp, Warning, TEXT("HERE"));
+			//UE_LOG(LogTemp, Warning, TEXT("UPDATED"));
+			bSearchPointNeedsUpdate = false;
 			SpawnTargetLocationHandler->RemoveRandomSearchPoints();
 			bSearchPointsDeleted = true;
 			StartSearch(AIStimulus, DebugLogText);
 
 
+		}
+
+		if (TargetMoveLocation && GetCharacter()->GetActorLocation().Equals(TargetMoveLocation->GetActorLocation(), 50.f))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Arrived"));
+			//CurrentAIState = EAIStates::LookingAround;
+			//bAIHasArrivedSearchLocation = false;
 		}
 
 
@@ -219,7 +227,11 @@ void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stim
 	AIStimulus = Stimulus;
 
 	LastStimulusLocation = Stimulus.StimulusLocation;
-	
+	if (CurrentAIState == EAIStates::Searching && Stimulus.WasSuccessfullySensed())
+	{
+		bSearchPointNeedsUpdate = true;
+		//UE_LOG(LogTemp, Warning, TEXT("Entered"));
+	}
 	
 }
 

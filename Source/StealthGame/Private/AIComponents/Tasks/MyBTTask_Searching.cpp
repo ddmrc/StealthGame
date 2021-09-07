@@ -70,7 +70,7 @@ void UMyBTTask_Searching::SelectTarget(UBehaviorTreeComponent& OwnerComp)
 
 	if (MoveToLocationList.Num() == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Selecting Search Location"));
+		//UE_LOG(LogTemp, Warning, TEXT("Selecting Search Location"));
 		UGameplayStatics::GetAllActorsOfClassWithTag(this, AMoveToLocationActor::StaticClass(), FName("Activated"), MoveToLocationList);
 		bMoveToScanned = true;
 	}
@@ -88,6 +88,13 @@ void UMyBTTask_Searching::SelectTarget(UBehaviorTreeComponent& OwnerComp)
 			CurrentMoveToTarget = MoveToLocationList[RandomNumber];
 			OwnerComp.GetBlackboardComponent()->SetValueAsObject("MoveToLocation", MoveToLocationList[RandomNumber]);
 			bIsMoveToLocationReached = false;
+
+			AEnemyAIController* AIController = Cast<AEnemyAIController>(OwnerComp.GetAIOwner()->GetCharacter()->GetController());
+			if (AIController)
+			{
+				AIController->TargetMoveLocation = MoveToLocationList[RandomNumber];
+				UE_LOG(LogTemp, Warning, TEXT("MoveTo Located"));
+			}
 		}
 		else
 		{
