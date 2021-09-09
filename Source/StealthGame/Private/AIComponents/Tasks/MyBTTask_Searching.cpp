@@ -22,6 +22,9 @@ EBTNodeResult::Type UMyBTTask_Searching::ExecuteTask(UBehaviorTreeComponent& Own
 	//Super::ExecuteTask(OwnerComp, NodeMemory);
 	EBTNodeResult::Type NodeResult = EBTNodeResult::InProgress;
 
+
+
+
 	SelectTarget(OwnerComp);
 
 	//COPY PASTE FROM ORIGINAL SOURCE CODE
@@ -30,6 +33,7 @@ EBTNodeResult::Type UMyBTTask_Searching::ExecuteTask(UBehaviorTreeComponent& Own
 	MyMemory->MoveRequestID = FAIRequestID::InvalidRequest;
 
 	AAIController* MyController = OwnerComp.GetAIOwner();
+
 	MyMemory->bWaitingForPath = bUseGameplayTasks ? false : MyController->ShouldPostponePathUpdates();
 	if (!MyMemory->bWaitingForPath)
 	{

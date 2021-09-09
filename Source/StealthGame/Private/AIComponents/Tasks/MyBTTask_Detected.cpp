@@ -15,7 +15,10 @@ EBTNodeResult::Type UMyBTTask_Detected::ExecuteTask(UBehaviorTreeComponent& Owne
 	//Super::ExecuteTask(OwnerComp, NodeMemory);
 	EBTNodeResult::Type NodeResult = EBTNodeResult::InProgress;
 
-	SetWaitTime(1.f);
+	//SetWaitTime(1.f);
+
+	FBTWaitTaskMemory* MyMemory = (FBTWaitTaskMemory*)NodeMemory;
+	MyMemory->RemainingWaitTime = FMath::FRandRange(FMath::Max(0.0f, WaitTime - RandomDeviation), (WaitTime + RandomDeviation));
 
 	return NodeResult;
 

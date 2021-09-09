@@ -3,6 +3,7 @@
 
 #include "Enemy/EnemyCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 
@@ -31,7 +32,7 @@ void AEnemyCharacter::Tick(float DeltaTime)
 	
 	UpdateMovementState();
 
-
+	
 }
 
 // Called to bind functionality to input
@@ -45,13 +46,24 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 void AEnemyCharacter::UpdateMovementState()
 {
 	AEnemyAIController* ThisController = Cast<AEnemyAIController>(GetController());
+	
+	if (ThisController->CurrentAIState == EAIStates::Searching && GetVelocity() == FVector::ZeroVector)
+	{
+		
+		CurrentMovementState = EMovementState::StaticSearch;
+		return;
+	}
+
 	if (ThisController->CurrentAIState == EAIStates::Idle && CurrentMovementState != EMovementState::Idle)
 	{
 		CurrentMovementState = EMovementState::Idle;
 	}
 	else if ((ThisController->CurrentAIState == EAIStates::Patrol || ThisController->CurrentAIState == EAIStates::Searching) && CurrentMovementState != EMovementState::Walking)
 	{
-		CurrentMovementState = EMovementState::Walking;
+			
+			CurrentMovementState = EMovementState::Walking;
+
+
 	}
 	else if (ThisController->CurrentAIState == EAIStates::Chasing && CurrentMovementState != EMovementState::Running)
 	{

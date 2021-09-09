@@ -35,7 +35,7 @@ public:
 
 	bool bSearchPointsDeleted = true;
 	bool bSearchPointNeedsUpdate= false;
-
+	bool bWantToSetPatrolTimer = true;
 
 
 
@@ -76,7 +76,8 @@ public:
 	UFUNCTION()
 	void SetAIState(EAIStates NewState);
 
-
+	UFUNCTION()
+	void CustomPauseTimer(bool bWantToPause, FTimerHandle Timer);
 
 
 

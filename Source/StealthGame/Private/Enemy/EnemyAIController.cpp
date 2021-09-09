@@ -64,6 +64,7 @@ void AEnemyAIController::Tick(float DeltaTime)
 	if (CurrentAIState == EAIStates::Patrol)
 	{
 
+
 		if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Sight")
 		{
 
@@ -139,7 +140,7 @@ void AEnemyAIController::Tick(float DeltaTime)
 	{
 
 
-		if (!GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer))
+		if (!GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer) && bWantToSetPatrolTimer)
 		{
 			GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
 			GetWorld()->GetTimerManager().SetTimer(LookAroundTimer, TimerSearchingToPatrol, 2.f, false);
@@ -172,15 +173,15 @@ void AEnemyAIController::Tick(float DeltaTime)
 			GetWorld()->GetTimerManager().PauseTimer(PatrolTimer);
 		}
 	
-
-		if (AIStimulus.IsExpired() )
+		//NEED TO FIX THIS TO SET
+		if (!AIStimulus.IsActive() )
 		{
 			if (SpawnTargetLocationHandler)
 			{
 				//UE_LOG(LogTemp, Warning, TEXT("Searching"));
 				SpawnTargetLocationHandler->RemoveRandomSearchPoints();
 			}
-
+			UE_LOG(LogTemp,Warning, TEXT("NOT ACTIVE"));
 			StartSearch(AIStimulus, DebugLogText);
 
 		}
@@ -345,4 +346,13 @@ void AEnemyAIController::StartSearch(FAIStimulus Stimulus, bool DebugLog)
 		GetWorld()->GetTimerManager().SetTimer(PatrolTimer, TimerSearchToConfused, TimerToConfusedSeconds, false);
 	}
 
+}
+
+
+void AEnemyAIController::CustomPauseTimer(bool bWantToPause, FTimerHandle Timer)
+{
+	if (bWantToPause)
+	{
+		GetWorld()->GetTimerManager().PauseTimer(Timer);
+	}
 }
