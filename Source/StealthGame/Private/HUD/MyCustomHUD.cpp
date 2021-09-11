@@ -49,7 +49,7 @@ void AMyCustomHUD::ReadPlayerStealthState()
 	{
 		EAIStates PlayerDetectetStatus = AICharacter->GetAICurrentState();
 
-		if (PlayerDetectetStatus == EAIStates::Patrol)
+		if (PlayerDetectetStatus == EAIStates::Patrol || PlayerDetectetStatus == EAIStates::Confused)
 		{
 			PlayerInGameUIWidget->UpdateEyeStateWidget(EEyeState::ClosedEye);
 		}
