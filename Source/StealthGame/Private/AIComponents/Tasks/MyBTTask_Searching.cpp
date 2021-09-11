@@ -6,6 +6,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
 #include "Enemy/EnemyAIController.h"
+#include "Enemy/EnemyCharacter.h"
 #include "GameFramework/Character.h"
 
 
@@ -112,8 +113,17 @@ void UMyBTTask_Searching::SelectTarget(UBehaviorTreeComponent& OwnerComp)
 
 		if (OwnerComp.GetAIOwner()->GetCharacter()->GetActorLocation().Equals(CurrentMoveToTarget->GetActorLocation(), 50.f))
 		{
+			AEnemyAIController* AIController = Cast<AEnemyAIController>(OwnerComp.GetAIOwner()->GetCharacter()->GetController());
+			if (AIController)
+			{
+				AEnemyCharacter* EnemyCharacter = Cast< AEnemyCharacter>(AIController->GetCharacter());
+				if (EnemyCharacter)
+				{
+					EnemyCharacter->UpdateForceRun(false);
+				}
+				//UE_LOG(LogTemp, Warning, TEXT("MoveTo Located"));
+			}
 
-			UE_LOG(LogTemp, Warning, TEXT("Arrived"));
 			bIsMoveToLocationReached = true;
 		}
 	}

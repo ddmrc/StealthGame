@@ -37,6 +37,7 @@ public:
 
 	EAIStates GetAICurrentState();
 
+	void UpdateForceRun(bool bForce);
 
 protected:
 	// Called when the game starts or when spawned
@@ -52,6 +53,8 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	EMovementState CurrentMovementState;
+
+	bool bForceRun = false;
 	
 
 

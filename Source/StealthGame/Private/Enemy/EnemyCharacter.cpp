@@ -47,31 +47,61 @@ void AEnemyCharacter::UpdateMovementState()
 {
 	AEnemyAIController* ThisController = Cast<AEnemyAIController>(GetController());
 	
-	if (ThisController->CurrentAIState == EAIStates::Searching && GetVelocity() == FVector::ZeroVector)
-	{
-		
-		CurrentMovementState = EMovementState::StaticSearch;
-		return;
-	}
+	//if (ThisController->CurrentAIState == EAIStates::Searching && GetVelocity() == FVector::ZeroVector)
+	//{
+	//	
+	//	CurrentMovementState = EMovementState::StaticSearch;
+	//	return;
+	//}
 
 	if (ThisController->CurrentAIState == EAIStates::Idle && CurrentMovementState != EMovementState::Idle)
 	{
 		CurrentMovementState = EMovementState::Idle;
 	}
-	else if ((ThisController->CurrentAIState == EAIStates::Patrol || ThisController->CurrentAIState == EAIStates::Searching) && CurrentMovementState != EMovementState::Walking)
+	else if (ThisController->CurrentAIState == EAIStates::Patrol  && CurrentMovementState != EMovementState::Walking)
 	{
 			
 			CurrentMovementState = EMovementState::Walking;
 
 
 	}
+	else if (ThisController->CurrentAIState == EAIStates::Searching)
+	{
+		if (GetVelocity() == FVector::ZeroVector)
+		{
+			CurrentMovementState = EMovementState::StaticSearch;
+			return;
+		}
+		else if (bForceRun)
+		{
+			//Nothing, keep Running
+			CurrentMovementState = EMovementState::Running;
+			return;
+		}
+		else if (CurrentMovementState == EMovementState::Walking && !bForceRun)
+		{
+			//Nothing, keep Walking
+			CurrentMovementState = EMovementState::Walking;
+		}
+
+		else
+		{
+			//Emergency change state to walking
+			CurrentMovementState = EMovementState::Walking;
+		}
+	}
 	else if (ThisController->CurrentAIState == EAIStates::Chasing && CurrentMovementState != EMovementState::Running)
 	{
 		CurrentMovementState = EMovementState::Running;
+		bForceRun = true;
 	}
 	else if ((ThisController->CurrentAIState == EAIStates::Detected || ThisController->CurrentAIState == EAIStates::Confused) && CurrentMovementState != EMovementState::Stopped)
 	{
 		CurrentMovementState = EMovementState::Stopped;
+		if (ThisController->CurrentAIState == EAIStates::Confused)
+		{
+			bForceRun = false;
+		}
 	}
 	else if (ThisController->CurrentAIState == EAIStates::LookingAround)
 	{
@@ -99,3 +129,10 @@ EAIStates AEnemyCharacter::GetAICurrentState()
 		return EAIStates::Idle;
 	}
 }
+
+void AEnemyCharacter::UpdateForceRun(bool bForce)
+{
+	//Used in Search Task to stop running when arrive
+	//to location
+	bForceRun = bForce;
+};
