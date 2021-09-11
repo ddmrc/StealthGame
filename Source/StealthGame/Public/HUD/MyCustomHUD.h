@@ -30,7 +30,12 @@ public:
 
 	UPlayerInGameUIWidget* PlayerInGameUIWidget;
 
-	AEnemyCharacter* AICharacter = nullptr;
+	AEnemyCharacter* AICharacter1 = nullptr;
+	AEnemyCharacter* AICharacter2 = nullptr;
+
+
+
+	int32 NumberOfAIEnemies = 0;
 
 
 };

@@ -23,14 +23,22 @@ void AMyCustomHUD::BeginPlay()
 		}
 	}
 
-	if (AICharacter == nullptr)
+	if (AICharacter1 == nullptr || AICharacter2 == nullptr)
 	{
 		TArray<AActor*> ActorArray;
 		UGameplayStatics::GetAllActorsOfClass(this, AEnemyCharacter::StaticClass(), ActorArray);
 
+		NumberOfAIEnemies = ActorArray.Num();
+
+
 		if (ActorArray.IsValidIndex(0))
 		{
-			AICharacter = Cast<AEnemyCharacter>(ActorArray[0]);
+			AICharacter1 = Cast<AEnemyCharacter>(ActorArray[0]);
+		}
+
+		if (ActorArray.IsValidIndex(1))
+		{
+			AICharacter2 = Cast<AEnemyCharacter>(ActorArray[1]);
 		}
 	}
 }
@@ -45,21 +53,59 @@ void AMyCustomHUD::Tick(float DeltaSeconds)
 
 void AMyCustomHUD::ReadPlayerStealthState()
 {
-	if (AICharacter && PlayerInGameUIWidget)
-	{
-		EAIStates PlayerDetectetStatus = AICharacter->GetAICurrentState();
 
-		if (PlayerDetectetStatus == EAIStates::Patrol || PlayerDetectetStatus == EAIStates::Confused)
+	if (NumberOfAIEnemies == 1)
+	{
+		if (AICharacter1 && PlayerInGameUIWidget)
 		{
-			PlayerInGameUIWidget->UpdateEyeStateWidget(EEyeState::ClosedEye);
+			EAIStates PlayerDetectetStatus = AICharacter1->GetAICurrentState();
+
+			if (PlayerDetectetStatus == EAIStates::Patrol || PlayerDetectetStatus == EAIStates::Confused)
+			{
+				PlayerInGameUIWidget->UpdateEyeStateWidget(EEyeState::ClosedEye);
+			}
+			else if (PlayerDetectetStatus == EAIStates::Searching)
+			{
+				PlayerInGameUIWidget->UpdateEyeStateWidget(EEyeState::SearchEye);
+			}
+			else if (PlayerDetectetStatus == EAIStates::Detected)
+			{
+				PlayerInGameUIWidget->UpdateEyeStateWidget(EEyeState::OpenEye);
+			}
 		}
-		else if (PlayerDetectetStatus == EAIStates::Searching)
+	}
+	else if (NumberOfAIEnemies == 2)
+	{
+		if (AICharacter1 &&AICharacter2 && PlayerInGameUIWidget)
 		{
-			PlayerInGameUIWidget->UpdateEyeStateWidget(EEyeState::SearchEye);
-		}
-		else if (PlayerDetectetStatus == EAIStates::Detected)
-		{
-			PlayerInGameUIWidget->UpdateEyeStateWidget(EEyeState::OpenEye);
+			EAIStates PlayerDetectetStatus = EAIStates::Patrol; //Default
+
+			if (AICharacter1->GetAICurrentState() == EAIStates::Chasing || AICharacter2->GetAICurrentState() == EAIStates::Chasing)
+			{
+				PlayerDetectetStatus = EAIStates::Chasing;
+			}
+			else if (AICharacter1->GetAICurrentState() == EAIStates::Detected || AICharacter2->GetAICurrentState() == EAIStates::Detected)
+			{
+				PlayerDetectetStatus = EAIStates::Detected;
+			}
+			else if (AICharacter1->GetAICurrentState() == EAIStates::Searching || AICharacter2->GetAICurrentState() == EAIStates::Searching)
+			{
+				PlayerDetectetStatus = EAIStates::Searching;
+			}
+
+
+			if (PlayerDetectetStatus == EAIStates::Patrol || PlayerDetectetStatus == EAIStates::Confused)
+			{
+				PlayerInGameUIWidget->UpdateEyeStateWidget(EEyeState::ClosedEye);
+			}
+			else if (PlayerDetectetStatus == EAIStates::Searching)
+			{
+				PlayerInGameUIWidget->UpdateEyeStateWidget(EEyeState::SearchEye);
+			}
+			else if (PlayerDetectetStatus == EAIStates::Detected || PlayerDetectetStatus == EAIStates::Chasing)
+			{
+				PlayerInGameUIWidget->UpdateEyeStateWidget(EEyeState::OpenEye);
+			}
 		}
 	}
 	
