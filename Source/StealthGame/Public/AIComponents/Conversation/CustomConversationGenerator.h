@@ -47,18 +47,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = "SoundHandlers")
 	USoundCue* Silence;
 
-	UPROPERTY(EditAnywhere, Category = "Dialog Volume")
-		float DialogSoundIntensity = 750.f;
-
-	bool bHasConversationBeenLoaded = false;
-
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:	
 
-
+	bool Test = true;
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -72,6 +67,4 @@ public:
 
 	UFUNCTION()
 	void WaitForAnswer();
-
-	void SimulateConversation();
 };

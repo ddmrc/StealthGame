@@ -22,7 +22,7 @@ void UCustomConversationGenerator::BeginPlay()
 	Super::BeginPlay();
 
 	
-
+	LoadConversation("B");
 	
 	if (AudioPlayer == nullptr)
 	{
@@ -44,33 +44,46 @@ void UCustomConversationGenerator::TickComponent(float DeltaTime, ELevelTick Tic
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!bHasConversationBeenLoaded)
+
+
+	if (AudioPlayer)
 	{
-		FString CategoryToLoad;
-		int32 RandCategory = FMath::RandRange(0, 2);
-		switch (RandCategory)
+		if (!AudioPlayer->IsPlaying()) //SET AUDIO
 		{
-		case 0:
-			CategoryToLoad = "A";
-			break;
-		case 1:
-			CategoryToLoad = "B";
-			break;
-		case 2:
-			CategoryToLoad = "C";
-			break;
-		default:
-			CategoryToLoad = "A";
-			break;
+			if (Conversation.IsValidIndex(0) && Conversation[0] != nullptr)
+			{
+				AudioPlayer->SetSound(Conversation[0]);
+				Conversation[0] = nullptr;
+				UE_LOG(LogTemp, Warning, TEXT("CHANING AUDIO 1"));
+			}
+			else if (Conversation.IsValidIndex(1) && Conversation[1] != nullptr)
+			{
+				AudioPlayer->SetSound(Conversation[1]);
+				Conversation[1] = nullptr;
+				UE_LOG(LogTemp, Warning, TEXT("CHANING AUDIO 2"));
+			}
+			else if (Conversation.IsValidIndex(2) && Conversation[2] != nullptr)
+			{
+				AudioPlayer->SetSound(Conversation[2]);
+				Conversation[2] = nullptr;
+				UE_LOG(LogTemp, Warning, TEXT("CHANING AUDIO 3"));
+			}
+			else if (Conversation[2] == nullptr)
+			{
 
+				AudioPlayer->Sound = nullptr;
+			}
 		}
-		LoadConversation(CategoryToLoad);
 
-		bHasConversationBeenLoaded = true;
+		if (AudioPlayer->Sound && AudioPlayer->Sound->IsPlayable() && !AudioPlayer->IsPlaying())//PLAY AUDIO
+		{
+			AudioPlayer->Play();
+			
+		}
+
+		
 	}
 
-
-	SimulateConversation();
 
 
 
@@ -79,8 +92,6 @@ void UCustomConversationGenerator::TickComponent(float DeltaTime, ELevelTick Tic
 
 void UCustomConversationGenerator::LoadConversation(FString Category)
 {
-	Conversation.Empty();
-
 	USoundCue* Stitch1 = ReturnSoundCue(Category, 1);
 	USoundCue* Stitch2 = ReturnSoundCue(Category, 2);
 	USoundCue* Stitch3 = ReturnSoundCue(Category, 3);
@@ -235,46 +246,3 @@ void UCustomConversationGenerator::WaitForAnswer()
 
 }
 
-void UCustomConversationGenerator::SimulateConversation()
-{
-	if (AudioPlayer)
-	{
-		if (!AudioPlayer->IsPlaying()) //SET AUDIO
-		{
-			if (Conversation.IsValidIndex(0) && Conversation[0] != nullptr)
-			{
-				AudioPlayer->SetSound(Conversation[0]);
-				Conversation[0] = nullptr;
-				//UE_LOG(LogTemp, Warning, TEXT("CHANING AUDIO 1"));
-			}
-			else if (Conversation.IsValidIndex(1) && Conversation[1] != nullptr)
-			{
-				AudioPlayer->SetSound(Conversation[1]);
-				Conversation[1] = nullptr;
-				//UE_LOG(LogTemp, Warning, TEXT("CHANING AUDIO 2"));
-			}
-			else if (Conversation.IsValidIndex(2) && Conversation[2] != nullptr)
-			{
-				AudioPlayer->SetSound(Conversation[2]);
-				Conversation[2] = nullptr;
-				//UE_LOG(LogTemp, Warning, TEXT("CHANING AUDIO 3"));
-
-			}
-			else if (Conversation[2] == nullptr)
-			{
-
-				AudioPlayer->Sound = nullptr;
-				bHasConversationBeenLoaded = false;
-				Conversation.Empty();
-			}
-		}
-
-		if (AudioPlayer->Sound && AudioPlayer->Sound->IsPlayable() && !AudioPlayer->IsPlaying())//PLAY AUDIO
-		{
-			AudioPlayer->Play(0.0f, DialogSoundIntensity, true, true);
-
-		}
-
-
-	}
-}
