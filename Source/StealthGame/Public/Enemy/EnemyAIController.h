@@ -24,6 +24,7 @@ enum class EAIStates : uint8
 	Confused,
 	Searching,
 	LookingAround,
+	Conversation,
 };
 
 
