@@ -35,6 +35,8 @@ void UCustomConversationGenerator::BeginPlay()
 	{
 		AudioPlayer->OnAudioFinished.AddDynamic(this, &UCustomConversationGenerator::WaitForAnswer);
 	}
+
+	ToggleHasFinishedSpeaking.BindUFunction(this, FName("ToggleHasFinishedTalkingToTrue"));
 	
 }
 
@@ -43,35 +45,6 @@ void UCustomConversationGenerator::BeginPlay()
 void UCustomConversationGenerator::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (!bHasConversationBeenLoaded)
-	{
-		FString CategoryToLoad;
-		int32 RandCategory = FMath::RandRange(0, 2);
-		switch (RandCategory)
-		{
-		case 0:
-			CategoryToLoad = "A";
-			break;
-		case 1:
-			CategoryToLoad = "B";
-			break;
-		case 2:
-			CategoryToLoad = "C";
-			break;
-		default:
-			CategoryToLoad = "A";
-			break;
-
-		}
-		LoadConversation(CategoryToLoad);
-
-		bHasConversationBeenLoaded = true;
-	}
-
-
-	SimulateConversation();
-
 
 
 
@@ -88,6 +61,7 @@ void UCustomConversationGenerator::LoadConversation(FString Category)
 	Conversation.Add(Stitch1);
 	Conversation.Add(Stitch2);
 	Conversation.Add(Stitch3);
+
 }
 
 USoundCue* UCustomConversationGenerator::ReturnSoundCue(FString Category, int32 SubCategoryNumber)
@@ -231,47 +205,51 @@ void UCustomConversationGenerator::WaitForAnswer()
 		AudioPlayer->SetSound(Silence);
 		AudioPlayer->Play();
 	}
+	
+	FTimerHandle HasFinishedSpeaking;
+	GetWorld()->GetTimerManager().ClearTimer(HasFinishedSpeaking);
+	GetWorld()->GetTimerManager().SetTimer(HasFinishedSpeaking, ToggleHasFinishedSpeaking, AudioPlayer->Sound->Duration, false);
+}
 
+
+
+
+void UCustomConversationGenerator::ToggleHasFinishedTalkingToTrue()
+{
+	bHasFinishedTalking = true;
 
 }
 
-void UCustomConversationGenerator::SimulateConversation()
+void UCustomConversationGenerator::ToggleThroughPhrases()
 {
-	if (AudioPlayer)
+	if (AudioPlayer && !AudioPlayer->IsPlaying())
 	{
-		if (!AudioPlayer->IsPlaying()) //SET AUDIO
+		if (Conversation.IsValidIndex(0) && Conversation[0] != nullptr)
 		{
-			if (Conversation.IsValidIndex(0) && Conversation[0] != nullptr)
-			{
-				AudioPlayer->SetSound(Conversation[0]);
-				Conversation[0] = nullptr;
-				//UE_LOG(LogTemp, Warning, TEXT("CHANING AUDIO 1"));
-			}
-			else if (Conversation.IsValidIndex(1) && Conversation[1] != nullptr)
-			{
-				AudioPlayer->SetSound(Conversation[1]);
-				Conversation[1] = nullptr;
-				//UE_LOG(LogTemp, Warning, TEXT("CHANING AUDIO 2"));
-			}
-			else if (Conversation.IsValidIndex(2) && Conversation[2] != nullptr)
-			{
-				AudioPlayer->SetSound(Conversation[2]);
-				Conversation[2] = nullptr;
-				//UE_LOG(LogTemp, Warning, TEXT("CHANING AUDIO 3"));
+			AudioPlayer->SetSound(Conversation[0]);
+			Conversation[0] = nullptr;
 
-			}
-			else if (Conversation[2] == nullptr)
-			{
 
-				AudioPlayer->Sound = nullptr;
-				bHasConversationBeenLoaded = false;
-				Conversation.Empty();
-			}
+		}
+		else if (Conversation.IsValidIndex(1) && Conversation[1] != nullptr)
+		{
+			AudioPlayer->SetSound(Conversation[1]);
+			Conversation[1] = nullptr;
+
+		}
+		else if (Conversation.IsValidIndex(2) && Conversation[2] != nullptr)
+		{
+			AudioPlayer->SetSound(Conversation[2]);
+			Conversation[2] = nullptr;
+			
+
 		}
 
 		if (AudioPlayer->Sound && AudioPlayer->Sound->IsPlayable() && !AudioPlayer->IsPlaying())//PLAY AUDIO
 		{
+			bHasFinishedTalking = false;
 			AudioPlayer->Play(0.0f, DialogSoundIntensity, true, true);
+
 
 		}
 

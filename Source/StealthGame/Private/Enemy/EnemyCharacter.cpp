@@ -22,6 +22,7 @@ void AEnemyCharacter::BeginPlay()
 	Super::BeginPlay();
 	
 	CurrentMovementState = EMovementState::Idle;
+	//SetGenericTeamId(2);
 }
 
 // Called every frame
@@ -31,7 +32,9 @@ void AEnemyCharacter::Tick(float DeltaTime)
 
 	
 	UpdateMovementState();
-
+	/*FString NM;
+	GetName(NM);
+	UE_LOG(LogTemp, Warning, TEXT("This Character: %s"), *NM);*/
 	
 }
 

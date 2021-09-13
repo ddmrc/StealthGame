@@ -24,6 +24,17 @@ void AStealthGameModeBase::BeginPlay()
 		FinishLine->PlayerEntersFinishLine.AddDynamic(this,&AStealthGameModeBase::PlayerWinsGame);
 	}
 
+	if (SpeechManager == nullptr)
+	{
+		SpeechManager = Cast<ASpeechManager>(UGameplayStatics::GetActorOfClass(GetWorld(), ASpeechManager::StaticClass()));
+		if (!SpeechManager)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Speech Manager Actor Not Found In Current Level."));
+		}
+	}
+
+	
+
 	
 }
 

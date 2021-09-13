@@ -51,6 +51,12 @@ public:
 		float DialogSoundIntensity = 750.f;
 
 	bool bHasConversationBeenLoaded = false;
+	bool bHasFinishedTalking = false;
+	bool bStartConversation = false;
+
+	UCustomConversationGenerator* OtherConversationGenerator;
+	FTimerDelegate ToggleHasFinishedSpeaking;
+	AActor* OtherActorInConversation;
 
 protected:
 	// Called when the game starts
@@ -73,5 +79,11 @@ public:
 	UFUNCTION()
 	void WaitForAnswer();
 
-	void SimulateConversation();
+
+	UFUNCTION()
+	void ToggleThroughPhrases();
+
+
+	UFUNCTION()
+		void ToggleHasFinishedTalkingToTrue();
 };

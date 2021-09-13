@@ -21,6 +21,8 @@ void AEnemyAIController::BeginPlay()
 		PlayerCharacter = Cast<AMyPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	}
 
+
+
 	if (SpawnTargetLocationHandler == nullptr)
 	{
 		TArray <AActor*> Arr;
@@ -39,6 +41,16 @@ void AEnemyAIController::BeginPlay()
 
 	}
 
+	if (SpeechManager == nullptr)
+	{
+		SpeechManager = Cast< AStealthGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->SpeechManager;
+
+		if (!SpeechManager)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Speech Manager Reference Not Detected In EnemyAIController.h (49)"));
+		}
+	}
+
 	//setting up timerhandle for this function
 	TimerSearchingToPatrol.BindUFunction(this, FName("SetAIState"), EAIStates::Patrol);
 	TimerSearchToConfused.BindUFunction(this, FName("SetAIState"), EAIStates::Confused);
@@ -50,13 +62,17 @@ void AEnemyAIController::BeginPlay()
 	GetBlackboardComponent()->SetValue<UBlackboardKeyType_Enum>(FName("CurrentState"), (uint8)CurrentAIState);
 	GetBlackboardComponent()->SetValueAsObject("PlayerCharacter", PlayerCharacter); 
 
-	SetGenericTeamId(2);
+
 }
 
 void AEnemyAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	FString NM;
+	GetCharacter()->GetName(NM);
+	UE_LOG(LogTemp, Warning, TEXT("This Character: %s"), *NM);
 
+	SpeechManager->RequestJoinConversation(GetCharacter());
 	//AILookAroundMechanic();
 
 	//UE_LOG(LogTemp, Warning, TEXT("AgeStimulus: %s"), *FString::SanitizeFloat(AIStimulus.GetAge()));
@@ -76,13 +92,33 @@ void AEnemyAIController::Tick(float DeltaTime)
 
 		else if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Hearing")
 		{
+			if (ActorSendingStimulus->Tags[0] == "PlayerCharacter")
+			{
+				GetWorld()->GetTimerManager().PauseTimer(LookAroundTimer);
+				StartSearch(AIStimulus, DebugLogText);
 
-			GetWorld()->GetTimerManager().PauseTimer(LookAroundTimer);
+				return;
+			}
+			else if (ActorSendingStimulus->Tags[0] == "AISentinel" )
+			{
+				
 
 
 
-			StartSearch(AIStimulus, DebugLogText);
-			return;
+
+
+
+				/*if (SpeechManager->RequestJoinConversation(GetCharacter()))
+				{
+					bNotInQueForSpeaking = true;
+					SetAIState(EAIStates::Conversation);
+					return;
+				}*/
+				
+			}
+		
+
+			
 
 		}
 
@@ -155,8 +191,19 @@ void AEnemyAIController::Tick(float DeltaTime)
 		}
 		else if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Hearing")
 		{
-
-			StartSearch(AIStimulus, DebugLogText);
+			if (ActorSendingStimulus->Tags[0] == "PlayerCharacter")
+			{
+				StartSearch(AIStimulus, DebugLogText);
+				return;
+			}
+			else if (ActorSendingStimulus->Tags[0] == "AISentinel")
+			{
+				if (SpeechManager->RequestJoinConversation(GetCharacter()))
+				{
+					SetAIState(EAIStates::Conversation);
+				}
+			}
+			
 		}
 
 
@@ -224,15 +271,41 @@ void AEnemyAIController::Tick(float DeltaTime)
 			bSearchPointsDeleted = true;
 		}
 	}
+
+	else if (CurrentAIState == EAIStates::Conversation)
+	{
+		GetWorld()->GetTimerManager().PauseTimer(LookAroundTimer);
+
+		
+		bNotInQueForSpeaking = false;
+		if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Sight")
+		{
+
+			SetAIState(EAIStates::Detected);
+
+		}
+		else if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Hearing")
+		{
+			if (ActorSendingStimulus->Tags[0] == "PlayerCharacter")
+			{
+				StartSearch(AIStimulus, DebugLogText);
+				return;
+			}
+
+
+		}
+
+
+	}
 	
 	
 }
 
 void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
-
+	ActorSendingStimulus = Actor;
 	AIStimulus = Stimulus;
-
+	//AISentinel
 	LastStimulusLocation = Stimulus.StimulusLocation;
 	if (CurrentAIState == EAIStates::Searching && Stimulus.WasSuccessfullySensed())
 	{
@@ -272,6 +345,9 @@ void AEnemyAIController::SetAIState(EAIStates NewState)
 			break;
 		case EAIStates::LookingAround:
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::White, TEXT("AI Looking Around"));
+			break;
+		case EAIStates::Conversation:
+			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Orange, TEXT("Conversation"));
 			break;
 
 

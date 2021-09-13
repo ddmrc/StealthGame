@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Enemy/EnemyAIController.h"
+#include "GenericTeamAgentInterface.h"
 #include "EnemyCharacter.generated.h"
 
 UENUM()
@@ -55,6 +56,8 @@ protected:
 	EMovementState CurrentMovementState;
 
 	bool bForceRun = false;
+
+	//virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID)override { TeamID = NewTeamID; }
 	
 
 

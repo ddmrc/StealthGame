@@ -7,7 +7,9 @@
 #include "AIController.h"
 #include "Perception/AIPerceptionTypes.h"
 #include "Player/MyPlayerCharacter.h"
+#include "GenericTeamAgentInterface.h"
 #include "AIComponents/Navigation/SpawnAITargetLocationHandler.h"
+#include "GameMode/StealthGameModeBase.h"
 #include "EnemyAIController.generated.h"
 
 
@@ -63,10 +65,16 @@ public:
 
 	ASpawnAITargetLocationHandler* SpawnTargetLocationHandler = nullptr;
 
+
 	FAIStimulus AIStimulus;
 	EAIStates LastState;
 
 	AActor* TargetMoveLocation = nullptr;
+	AActor* ActorSendingStimulus = nullptr;
+
+	ASpeechManager* SpeechManager = nullptr;
+
+	bool bNotInQueForSpeaking = false;
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
