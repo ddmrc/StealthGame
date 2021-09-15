@@ -9,18 +9,17 @@
 #include "AIComponents/Tasks/MyBTTask_Searching.h"
 #include <DrawDebugHelpers.h>
 
-
-void AEnemyAIController::BeginPlay()
+void AEnemyAIController::SetUpPointerVariables()
 {
-
-	Super::BeginPlay();
-
 
 	if (PlayerCharacter == nullptr)
 	{
 		PlayerCharacter = Cast<AMyPlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+		if (!PlayerCharacter)
+		{
+			UE_LOG(LogTemp, Error, TEXT("Player Character Not Found In EnemyAIController.cpp (17)."));
+		}
 	}
-
 
 
 	if (SpawnTargetLocationHandler == nullptr)
@@ -32,13 +31,11 @@ void AEnemyAIController::BeginPlay()
 		{
 			SpawnTargetLocationHandler = Cast< ASpawnAITargetLocationHandler>(Arr[0]);
 		}
-	}
 
-
-	if (UAIPerceptionComponent* ThisPerceptionComponent = GetPerceptionComponent())
-	{
-		ThisPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemyAIController::TargetPerceptionUpdated);
-
+		if (!SpawnTargetLocationHandler)
+		{
+			UE_LOG(LogTemp, Error, TEXT("SpawnTargetLocationHandler Not Detected In EnemyAIController.cpp (32)."));
+		}
 	}
 
 	if (SpeechManager == nullptr)
@@ -51,75 +48,92 @@ void AEnemyAIController::BeginPlay()
 		}
 	}
 
+}
+
+void AEnemyAIController::BindingFunctions()
+{
+	if (UAIPerceptionComponent* ThisPerceptionComponent = GetPerceptionComponent())
+	{
+		ThisPerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &AEnemyAIController::TargetPerceptionUpdated);
+
+	}
+
 	//setting up timerhandle for this function
 	TimerSearchingToPatrol.BindUFunction(this, FName("SetAIState"), EAIStates::Patrol);
 	TimerSearchToConfused.BindUFunction(this, FName("SetAIState"), EAIStates::Confused);
 	TimerDetectedToChasing.BindUFunction(this, FName("SetAIState"), EAIStates::Chasing);
 	TimerDetectedToLookAround.BindUFunction(this, FName("SetAIState"), EAIStates::LookingAround);
+	TimerDetectAllies.BindUFunction(this, FName("ToggleDetectAllies"), false);
+}
 
+void AEnemyAIController::SettingUpBlackBoard()
+{
 	//SETTING UP AI BEHAVIOUR TREE & BLACKBOARD
 	CurrentAIState = EAIStates::Patrol;
 	GetBlackboardComponent()->SetValue<UBlackboardKeyType_Enum>(FName("CurrentState"), (uint8)CurrentAIState);
-	GetBlackboardComponent()->SetValueAsObject("PlayerCharacter", PlayerCharacter); 
+	GetBlackboardComponent()->SetValueAsObject("PlayerCharacter", PlayerCharacter);
+}
 
+/*   */
+
+void AEnemyAIController::BeginPlay()
+{
+
+	Super::BeginPlay();
+
+	SetUpPointerVariables();
+	BindingFunctions();
+	SettingUpBlackBoard();
 
 }
 
 void AEnemyAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	FString NM;
-	GetCharacter()->GetName(NM);
-	UE_LOG(LogTemp, Warning, TEXT("This Character: %s"), *NM);
 
-	SpeechManager->RequestJoinConversation(GetCharacter());
-	//AILookAroundMechanic();
-
-	//UE_LOG(LogTemp, Warning, TEXT("AgeStimulus: %s"), *FString::SanitizeFloat(AIStimulus.GetAge()));
-
+	
+	//DEBUG SPEECH
+	if (DebugSpeech)
+	{
+		DebugSpeech = false;
+		//SpeechManager->RequestJoinConversation(GetCharacter());
+	}
 	if (CurrentAIState == EAIStates::Patrol)
 	{
 
-
 		if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Sight")
 		{
+			if (ActorTriggeredStimulus && ActorTriggeredStimulus == PlayerCharacter)
+			{
+				GetWorld()->GetTimerManager().PauseTimer(LookAroundTimer);
+				SetAIState(EAIStates::Detected);
+				return;
+			}
+			else
+			{
+			
 
-			GetWorld()->GetTimerManager().PauseTimer(LookAroundTimer);
-			SetAIState(EAIStates::Detected);
-			return;
+			}
+
 
 		}
-
+		
 		else if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Hearing")
 		{
-			if (ActorSendingStimulus->Tags[0] == "PlayerCharacter")
+			if (ActorTriggeredStimulus && ActorTriggeredStimulus == PlayerCharacter)
 			{
 				GetWorld()->GetTimerManager().PauseTimer(LookAroundTimer);
 				StartSearch(AIStimulus, DebugLogText);
-
 				return;
 			}
-			else if (ActorSendingStimulus->Tags[0] == "AISentinel" )
+			else
 			{
-				
-
-
-
-
-
-
-				/*if (SpeechManager->RequestJoinConversation(GetCharacter()))
+				if (ActorTriggeredStimulus && ActorTriggeredStimulus->GetActorLocation().Equals(GetCharacter()->GetActorLocation(), 1000.f))
 				{
-					bNotInQueForSpeaking = true;
 					SetAIState(EAIStates::Conversation);
-					return;
-				}*/
-				
+					
+				}
 			}
-		
-
-			
-
 		}
 
 		if (!GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer))
@@ -134,31 +148,32 @@ void AEnemyAIController::Tick(float DeltaTime)
 	else if (CurrentAIState == EAIStates::Searching)
 	{
 
-		//IF Noise Strength is 1 then radius is more specifc if it's weaker radius is wider
-		//Also keep into account
-
-
-
 		if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Sight")
 		{
-			//LastStimulusLocation = AIStimulus->StimulusLocation;
-			SetAIState(EAIStates::Detected);
-			
-			
+			if (ActorTriggeredStimulus && ActorTriggeredStimulus == PlayerCharacter)
+			{
+				SetAIState(EAIStates::Detected);
+			}
+			else
+			{
+
+			}
+	
 		}
 
-		else if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Hearing" && bSearchPointNeedsUpdate)
+		else if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Hearing" && bSearchPointNeedsUpdate && ActorTriggeredStimulus == PlayerCharacter)
 		{
-			
-			//Need to set this so it triggers only when SitmulusLocation is updated
-			//Because player has made sound elsewhere
-			//UE_LOG(LogTemp, Warning, TEXT("UPDATED"));
-			bSearchPointNeedsUpdate = false;
-			SpawnTargetLocationHandler->RemoveRandomSearchPoints();
-			bSearchPointsDeleted = true;
-			StartSearch(AIStimulus, DebugLogText);
+			if (ActorTriggeredStimulus && ActorTriggeredStimulus == PlayerCharacter)
+			{
+				bSearchPointNeedsUpdate = false;
+				SpawnTargetLocationHandler->RemoveRandomSearchPoints();
+				bSearchPointsDeleted = true;
+				StartSearch(AIStimulus, DebugLogText);
+			}
+			else
+			{
 
-
+			}
 		}
 
 		if (TargetMoveLocation && GetCharacter()->GetActorLocation().Equals(TargetMoveLocation->GetActorLocation(), 50.f))
@@ -175,66 +190,60 @@ void AEnemyAIController::Tick(float DeltaTime)
 
 	{
 
-
 		if (!GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer) && bWantToSetPatrolTimer)
 		{
 			GetWorld()->GetTimerManager().ClearTimer(LookAroundTimer);
 			GetWorld()->GetTimerManager().SetTimer(LookAroundTimer, TimerSearchingToPatrol, 2.f, false);
 		}
 
-
-		if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Sight")
+		if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Sight" && ActorTriggeredStimulus == PlayerCharacter)
 		{
-
-			SetAIState(EAIStates::Detected);
-
-		}
-		else if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Hearing")
-		{
-			if (ActorSendingStimulus->Tags[0] == "PlayerCharacter")
+			if (ActorTriggeredStimulus && ActorTriggeredStimulus == PlayerCharacter)
 			{
-				StartSearch(AIStimulus, DebugLogText);
-				return;
+				SetAIState(EAIStates::Detected);
 			}
-			else if (ActorSendingStimulus->Tags[0] == "AISentinel")
+			else
 			{
-				if (SpeechManager->RequestJoinConversation(GetCharacter()))
-				{
-					SetAIState(EAIStates::Conversation);
-				}
+
 			}
+			
 			
 		}
 
+		else if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Hearing" && ActorTriggeredStimulus == PlayerCharacter)
+		{
+			if (ActorTriggeredStimulus && ActorTriggeredStimulus == PlayerCharacter)
+			{
+				SetAIState(EAIStates::Detected);
+			}
+			else
+			{
 
-
+			}
+				StartSearch(AIStimulus, DebugLogText);
+				return;		
+		}
 		
 	}
 
 	else if (CurrentAIState == EAIStates::Chasing)
 	{
 
-
 		if (GetWorld()->GetTimerManager().IsTimerActive(PatrolTimer))
 		{
 			GetWorld()->GetTimerManager().PauseTimer(PatrolTimer);
 		}
 	
-		//NEED TO FIX THIS TO SET
-		if (!AIStimulus.IsActive() )
+		if (!AIStimulus.IsActive() && AIStimulus.Type.Name == "Default__AISense_Sight")
 		{
+
 			if (SpawnTargetLocationHandler)
 			{
-				//UE_LOG(LogTemp, Warning, TEXT("Searching"));
 				SpawnTargetLocationHandler->RemoveRandomSearchPoints();
 			}
-			UE_LOG(LogTemp,Warning, TEXT("NOT ACTIVE"));
+
 			StartSearch(AIStimulus, DebugLogText);
-
 		}
-
-
-
 	}
 
 	else if (CurrentAIState == EAIStates::Detected)
@@ -247,6 +256,11 @@ void AEnemyAIController::Tick(float DeltaTime)
 		if (GetWorld()->GetTimerManager().IsTimerActive(LookAroundTimer))
 		{
 			GetWorld()->GetTimerManager().PauseTimer(LookAroundTimer);
+		}		
+		
+		if (GetWorld()->GetTimerManager().IsTimerActive(DetectAlliesTimer))
+		{
+			GetWorld()->GetTimerManager().PauseTimer(DetectAlliesTimer);
 		}
 		
 
@@ -255,6 +269,8 @@ void AEnemyAIController::Tick(float DeltaTime)
 			GetWorld()->GetTimerManager().ClearTimer(DetectedTimer);
 			GetWorld()->GetTimerManager().SetTimer(DetectedTimer, TimerDetectedToChasing, 1.0f, false);
 		}
+
+
 	}
 
 	else if (CurrentAIState == EAIStates::Confused)
@@ -263,6 +279,14 @@ void AEnemyAIController::Tick(float DeltaTime)
 		{
 			GetWorld()->GetTimerManager().ClearTimer(SearchTimer);
 			GetWorld()->GetTimerManager().SetTimer(SearchTimer, TimerSearchingToPatrol, 2.0f, false, - 1.f);
+		}
+
+		if (!bIgnoreSenseFromAllies)
+		{
+			float TimeToDetectAllies = 7.f;
+			GetWorld()->GetTimerManager().ClearTimer(DetectAlliesTimer);
+			GetWorld()->GetTimerManager().SetTimer(DetectAlliesTimer, TimerDetectAllies, TimeToDetectAllies, false);
+
 		}
 
 		if (SpawnTargetLocationHandler && !bSearchPointsDeleted)
@@ -275,27 +299,33 @@ void AEnemyAIController::Tick(float DeltaTime)
 	else if (CurrentAIState == EAIStates::Conversation)
 	{
 		GetWorld()->GetTimerManager().PauseTimer(LookAroundTimer);
+		GetWorld()->GetTimerManager().PauseTimer(DetectAlliesTimer);
 
-		
-		bNotInQueForSpeaking = false;
-		if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Sight")
+
+		if (!SpeechManager->GetHasNetworkForConversationBeenSet())
 		{
-
-			SetAIState(EAIStates::Detected);
-
-		}
-		else if (AIStimulus.WasSuccessfullySensed() && AIStimulus.Type.Name == "Default__AISense_Hearing")
-		{
-			if (ActorSendingStimulus->Tags[0] == "PlayerCharacter")
+			if (SpeechManager->SpeakerOne == GetCharacter() || SpeechManager->SpeakerTwo == GetCharacter())
 			{
-				StartSearch(AIStimulus, DebugLogText);
-				return;
+
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *GetCharacter()->GetName());
+				SpeechManager->RequestJoinConversation(GetCharacter());
 			}
 
-
 		}
 
 
+		else if (!SpeechManager->GetIsConversationOnGoing())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Destroy"));
+			float TimeToDetectAllies = 7.f;
+			GetWorld()->GetTimerManager().ClearTimer(DetectAlliesTimer);
+			GetWorld()->GetTimerManager().SetTimer(DetectAlliesTimer, TimerDetectAllies, TimeToDetectAllies, false);
+			//SpeechManager->EmergencyKillAudio();
+			SetAIState(EAIStates::Patrol);
+		}
 	}
 	
 	
@@ -303,14 +333,60 @@ void AEnemyAIController::Tick(float DeltaTime)
 
 void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
-	ActorSendingStimulus = Actor;
+
 	AIStimulus = Stimulus;
-	//AISentinel
 	LastStimulusLocation = Stimulus.StimulusLocation;
+	if (Stimulus.WasSuccessfullySensed())
+	{
+
+
+		ActorTriggeredStimulus = Actor;
+
+
+
+		if (bIgnoreSenseFromAllies)
+		{
+			TArray<AActor*> HostileActors;
+			PerceptionComponent->GetPerceivedHostileActors(HostileActors);
+
+			if (HostileActors.IsValidIndex(0))
+			{
+				if (HostileActors[0] == PlayerCharacter && ActorTriggeredStimulus != PlayerCharacter)
+				{
+					ActorTriggeredStimulus = PlayerCharacter;
+				}
+
+
+			}
+			else
+			{
+				ActorTriggeredStimulus = nullptr;
+			}
+
+
+		}
+
+		if (ActorTriggeredStimulus && ActorTriggeredStimulus != PlayerCharacter && !bIgnoreSenseFromAllies)
+		{
+			bIgnoreSenseFromAllies = true;
+			float TimeToDetectAllies = 7.f;
+			GetWorld()->GetTimerManager().ClearTimer(DetectAlliesTimer);
+			GetWorld()->GetTimerManager().SetTimer(DetectAlliesTimer, TimerDetectAllies, TimeToDetectAllies, false);
+
+		}
+
+
+	}
+
+	if (ActorTriggeredStimulus)
+	{
+		
+	} 
+
 	if (CurrentAIState == EAIStates::Searching && Stimulus.WasSuccessfullySensed())
 	{
 		bSearchPointNeedsUpdate = true;
-		//UE_LOG(LogTemp, Warning, TEXT("Entered"));
+
 	}
 	
 }
@@ -366,15 +442,14 @@ void AEnemyAIController::StartSearch(FAIStimulus Stimulus, bool DebugLog)
 
 	FVector AILocation = Stimulus.ReceiverLocation;
 	FVector StimulusLocation = Stimulus.StimulusLocation;
-	float Distance = FMath::Abs(FVector::Distance(AILocation,StimulusLocation));
 
+	float Distance = FMath::Abs(FVector::Distance(AILocation,StimulusLocation));
 	float StimulusStrenght = Stimulus.Strength;
 
 	float RadiusForPoints = 250.f;
 	int32 NumberOfPointsToSpawn = 2;
 
 	float TimerToConfusedSeconds = 5.f;
-
 
 	if (Distance >= 1000.f)
 	{
@@ -402,16 +477,13 @@ void AEnemyAIController::StartSearch(FAIStimulus Stimulus, bool DebugLog)
 		DrawDebugSphere(GetWorld(), StimulusLocation, RadiusForPoints, 24, FColor::Blue, false, 5.f);
 	}
 
-	
-
 
 	if (SpawnTargetLocationHandler)
 	{
-			
-
 		SpawnTargetLocationHandler->SpawnRandomSearchPoints(LastStimulusLocation, RadiusForPoints, NumberOfPointsToSpawn);
 		bSearchPointsDeleted = false;
 	}
+
 	GetWorld()->GetTimerManager().PauseTimer(PatrolTimer);
 	SetAIState(EAIStates::Searching);
 
@@ -424,7 +496,6 @@ void AEnemyAIController::StartSearch(FAIStimulus Stimulus, bool DebugLog)
 
 }
 
-
 void AEnemyAIController::CustomPauseTimer(bool bWantToPause, FTimerHandle Timer)
 {
 	if (bWantToPause)
@@ -432,3 +503,10 @@ void AEnemyAIController::CustomPauseTimer(bool bWantToPause, FTimerHandle Timer)
 		GetWorld()->GetTimerManager().PauseTimer(Timer);
 	}
 }
+
+void AEnemyAIController::ToggleDetectAllies(bool bState)
+{
+	bIgnoreSenseFromAllies = bState;
+
+}
+

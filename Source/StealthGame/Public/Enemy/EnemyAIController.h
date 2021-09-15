@@ -29,72 +29,85 @@ enum class EAIStates : uint8
 	Conversation,
 };
 
-
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FActorPerceptionUpdatedDelegate, AActor*, Actor, FAIStimulus, Stimulus);
 UCLASS()
 class STEALTHGAME_API AEnemyAIController : public AAIController
 {
 	GENERATED_BODY()
 public:
 
-	bool bSearchPointsDeleted = true;
-	bool bSearchPointNeedsUpdate= false;
-	bool bWantToSetPatrolTimer = true;
+	/*VARIABLES*/
+	AActor* TargetMoveLocation = nullptr;
 
+	FAIStimulus AIStimulus;
 
-
-	UPROPERTY(EditAnywhere)
-	bool DebugLogText = false;
-
-
-	AMyPlayerCharacter* PlayerCharacter = nullptr;
+	FVector LastStimulusLocation = FVector::ZeroVector;
 
 	UPROPERTY()
 	EAIStates CurrentAIState;
 
-	FTimerHandle DetectedTimer;
-	FTimerHandle SearchTimer;
-	FTimerHandle PatrolTimer;
-	FTimerHandle LookAroundTimer;
+	/*FUNCTIONS*/
 
-	FTimerDelegate TimerSearchingToPatrol;
-	FTimerDelegate TimerDetectedToChasing;
-	FTimerDelegate TimerDetectedToLookAround;
-	FTimerDelegate TimerSearchToConfused;
-
-	FVector LastStimulusLocation = FVector::ZeroVector;
-
-	ASpawnAITargetLocationHandler* SpawnTargetLocationHandler = nullptr;
-
-
-	FAIStimulus AIStimulus;
-	EAIStates LastState;
-
-	AActor* TargetMoveLocation = nullptr;
-	AActor* ActorSendingStimulus = nullptr;
-
-	ASpeechManager* SpeechManager = nullptr;
-
-	bool bNotInQueForSpeaking = false;
-
-	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
-	//DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FActorPerceptionUpdatedDelegate, AActor*, Actor, FAIStimulus, Stimulus);
 	UFUNCTION()
 	void TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+
+	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 	void SetAIState(EAIStates NewState);
 
 	UFUNCTION()
-	void CustomPauseTimer(bool bWantToPause, FTimerHandle Timer);
-
-
-
-	UFUNCTION()
 	EAIStates RequestGetAIState();
 
 protected:
+
+	/*VARIABLES*/
+	AActor* ActorTriggeredStimulus = nullptr;
+	AMyPlayerCharacter* PlayerCharacter = nullptr;
+	ASpeechManager* SpeechManager = nullptr;
+	ASpawnAITargetLocationHandler* SpawnTargetLocationHandler = nullptr;
+
+
+	UPROPERTY(EditAnywhere)
+	bool DebugLogText = false;
+	bool bSearchPointsDeleted = true;
+	bool bSearchPointNeedsUpdate = false;
+	bool bWantToSetPatrolTimer = true;
+	bool bIgnoreSenseFromAllies = false;
+
+	FTimerHandle DetectedTimer;
+	FTimerHandle SearchTimer;
+	FTimerHandle PatrolTimer;
+	FTimerHandle LookAroundTimer;
+	FTimerHandle DetectAlliesTimer;
+
+	FTimerDelegate TimerSearchingToPatrol;
+	FTimerDelegate TimerDetectedToChasing;
+	FTimerDelegate TimerDetectedToLookAround;
+	FTimerDelegate TimerSearchToConfused;
+	FTimerDelegate TimerDetectAllies;
+
+
+
+	/*FUNCTIONS*/
+
+	virtual void BeginPlay() override;
+
+	void BindingFunctions();
+
+	UFUNCTION()
+	void CustomPauseTimer(bool bWantToPause, FTimerHandle Timer);
+
 	UFUNCTION()
 	void StartSearch(FAIStimulus Stimulus, bool DebugLog);
 
+	void SetUpPointerVariables();
+
+	void SettingUpBlackBoard();
+
+	UFUNCTION()
+	void ToggleDetectAllies(bool bState);
+
+	//DEBUG
+	bool DebugSpeech = true;
 };

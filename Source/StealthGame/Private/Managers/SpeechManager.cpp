@@ -23,11 +23,27 @@ void ASpeechManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
-	if (SettingUpNetworkForConversation())
+	if (bProcessIsAlive)
 	{
-		MediateConversation();
+		if (bIsConversationOnGoing)
+		{
+			MediateConversation();
+		}
+		else if (SettingUpNetworkForConversation())
+		{
+			bIsConversationOnGoing = true;
+			
+		}
+		
+		if (!IsConversationOnGoing())
+		{
+			bProcessIsAlive = false;
+			bHasNetworkForConversationBeenSet = true;
+			bIsConversationOnGoing = false;
+
+		}
 	}
+
 
 	
 
@@ -49,28 +65,38 @@ bool ASpeechManager::RequestJoinConversation(AActor* IncomingActor)
 			SpeakerTwo = IncomingActor;
 			SpeakerTwoComponent = SpeakerTwo->FindComponentByClass<UCustomConversationGenerator>();
 		}
+		else
+		{
+			return false;
+		}
 		
+		if (SpeakerOne && SpeakerTwo)
+		{
+			bHasNetworkForConversationBeenSet = false;
+			bProcessIsAlive = true;
+			return true;
+		}
 
-		bHasNetworkForConversationBeenSet = false;
-		return true;
 	}
 
 	return false;
 }
 
+
 bool ASpeechManager::SettingUpNetworkForConversation()
 {
 	if (SpeakerOne && SpeakerTwo && SpeakerOneComponent && SpeakerTwoComponent)
 	{
+
 		if (!bHasNetworkForConversationBeenSet)
 		{
 			FString Category = RandomConversationCategorySelector();
 
-			SpeakerOneComponent->LoadConversation("A");
-			SpeakerTwoComponent->LoadConversation("A");
+			SpeakerOneComponent->LoadConversation(Category);
+			SpeakerTwoComponent->LoadConversation(Category);
 
 			SpeakerTwoComponent->bHasFinishedTalking = true;
-			bIsConversationOnGoing = true;
+			bForceSpeakerOneTalk = true;
 			return true;
 		}
 		
@@ -117,51 +143,65 @@ void ASpeechManager::MediateConversation()
 	//S2 Sielce
 	//Check how much conversation left
 
-	if (SpeakerOneIsSpeaking() && SpeakerTwoComponent->bHasFinishedTalking)
+
+
+
+
+	if (!bForceSpeakerOneTalk && SpeakerOneComponent->bHasFinishedTalking && !SpeakerOneComponent->AudioPlayer->IsPlaying())
 	{
-		if (SpeakerOneComponent->bHasFinishedTalking)
-		{
-			SpeakerTwoIsSpeaking();
-		}
+
+		SpeakerTwoIsSpeaking();
+		bForceSpeakerOneTalk = true;
 	}
-	else
+	else if (bForceSpeakerOneTalk && SpeakerTwoComponent->bHasFinishedTalking && !SpeakerTwoComponent->AudioPlayer->IsPlaying())
 	{
-		bIsConversationOnGoing = false;
+
+		SpeakerOneIsSpeaking();
+		bForceSpeakerOneTalk = false;
+
+
+
+
 	}
+
+	
 
 }
 
 bool ASpeechManager::SpeakerOneIsSpeaking()
 {
-	if (!SpeakerOneComponent->AudioPlayer->IsPlaying() && IsConversationOnGoing())
-	{
+
 
 		SpeakerOneComponent->ToggleThroughPhrases();
 		
 		
-	}
+
 	
 	return IsConversationOnGoing();
 
 }
 bool ASpeechManager::SpeakerTwoIsSpeaking()
 {
-	if (!SpeakerTwoComponent->AudioPlayer->IsPlaying() && IsConversationOnGoing())
-	{
+
 
 		SpeakerTwoComponent->ToggleThroughPhrases();
 
 
-	}
-	UE_LOG(LogTemp, Warning, TEXT("LOL"));
+
+
 	return IsConversationOnGoing();
 }
 bool ASpeechManager::IsConversationOnGoing()
 {
-	if (SpeakerOneComponent->Conversation.IsValidIndex(2) && SpeakerOneComponent->Conversation[2] == nullptr)
+	if (SpeakerOneComponent->Conversation[2] == nullptr && SpeakerTwoComponent->Conversation[2] == nullptr)
 	{
-
+		SpeakerOne = nullptr;
+		SpeakerTwo = nullptr;
 		SpeakerOneComponent->AudioPlayer->Sound = nullptr;
+		SpeakerTwoComponent->AudioPlayer->Sound = nullptr;
+		bProcessIsAlive = false;
+		bIsConversationOnGoing = false;
+		UE_LOG(LogTemp, Warning, TEXT("Finished"));
 		return false;
 
 	}
@@ -169,4 +209,21 @@ bool ASpeechManager::IsConversationOnGoing()
 	{
 		return true;
 	}
+}
+void ASpeechManager::EmergencyKillAudio()
+{
+	if (SpeakerOne && SpeakerOneComponent)
+	{
+		SpeakerOneComponent->AudioPlayer->Stop();
+		SpeakerOne = nullptr;
+		SpeakerOneComponent = nullptr;
+	}
+
+	if (SpeakerTwo && SpeakerTwoComponent)
+	{
+		SpeakerTwoComponent->AudioPlayer->Stop();
+		SpeakerTwo = nullptr;
+		SpeakerTwoComponent = nullptr;
+	}
+	 
 }

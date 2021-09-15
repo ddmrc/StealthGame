@@ -40,13 +40,10 @@ void UCustomConversationGenerator::BeginPlay()
 	
 }
 
-
 // Called every frame
 void UCustomConversationGenerator::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-
 
 }
 
@@ -204,19 +201,19 @@ void UCustomConversationGenerator::WaitForAnswer()
 	{
 		AudioPlayer->SetSound(Silence);
 		AudioPlayer->Play();
+		FTimerHandle HasFinishedSpeaking;
+		GetWorld()->GetTimerManager().ClearTimer(HasFinishedSpeaking);
+		GetWorld()->GetTimerManager().SetTimer(HasFinishedSpeaking, ToggleHasFinishedSpeaking, AudioPlayer->Sound->Duration, false);
 	}
 	
-	FTimerHandle HasFinishedSpeaking;
-	GetWorld()->GetTimerManager().ClearTimer(HasFinishedSpeaking);
-	GetWorld()->GetTimerManager().SetTimer(HasFinishedSpeaking, ToggleHasFinishedSpeaking, AudioPlayer->Sound->Duration, false);
+
 }
-
-
-
 
 void UCustomConversationGenerator::ToggleHasFinishedTalkingToTrue()
 {
+	
 	bHasFinishedTalking = true;
+
 
 }
 
@@ -245,11 +242,14 @@ void UCustomConversationGenerator::ToggleThroughPhrases()
 
 		}
 
+
+
 		if (AudioPlayer->Sound && AudioPlayer->Sound->IsPlayable() && !AudioPlayer->IsPlaying())//PLAY AUDIO
 		{
 			bHasFinishedTalking = false;
 			AudioPlayer->Play(0.0f, DialogSoundIntensity, true, true);
 
+			
 
 		}
 
