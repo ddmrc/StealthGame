@@ -92,12 +92,6 @@ void AEnemyAIController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	
-	//DEBUG SPEECH
-	if (DebugSpeech)
-	{
-		DebugSpeech = false;
-		//SpeechManager->RequestJoinConversation(GetCharacter());
-	}
 	if (CurrentAIState == EAIStates::Patrol)
 	{
 
@@ -130,7 +124,7 @@ void AEnemyAIController::Tick(float DeltaTime)
 			{
 				if (ActorTriggeredStimulus && ActorTriggeredStimulus->GetActorLocation().Equals(GetCharacter()->GetActorLocation(), 1000.f))
 				{
-					SetAIState(EAIStates::Conversation);
+					//SetAIState(EAIStates::Conversation);
 					
 				}
 			}
@@ -300,34 +294,7 @@ void AEnemyAIController::Tick(float DeltaTime)
 	{
 		GetWorld()->GetTimerManager().PauseTimer(LookAroundTimer);
 		GetWorld()->GetTimerManager().PauseTimer(DetectAlliesTimer);
-
-
-		if (!SpeechManager->GetHasNetworkForConversationBeenSet())
-		{
-			if (SpeechManager->SpeakerOne == GetCharacter() || SpeechManager->SpeakerTwo == GetCharacter())
-			{
-
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *GetCharacter()->GetName());
-				SpeechManager->RequestJoinConversation(GetCharacter());
-			}
-
-		}
-
-
-		else if (!SpeechManager->GetIsConversationOnGoing())
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Destroy"));
-			float TimeToDetectAllies = 7.f;
-			GetWorld()->GetTimerManager().ClearTimer(DetectAlliesTimer);
-			GetWorld()->GetTimerManager().SetTimer(DetectAlliesTimer, TimerDetectAllies, TimeToDetectAllies, false);
-			//SpeechManager->EmergencyKillAudio();
-			SetAIState(EAIStates::Patrol);
-		}
 	}
-	
 	
 }
 
@@ -339,10 +306,7 @@ void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stim
 	if (Stimulus.WasSuccessfullySensed())
 	{
 
-
 		ActorTriggeredStimulus = Actor;
-
-
 
 		if (bIgnoreSenseFromAllies)
 		{
@@ -377,11 +341,6 @@ void AEnemyAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stim
 
 
 	}
-
-	if (ActorTriggeredStimulus)
-	{
-		
-	} 
 
 	if (CurrentAIState == EAIStates::Searching && Stimulus.WasSuccessfullySensed())
 	{

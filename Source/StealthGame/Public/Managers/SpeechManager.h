@@ -16,46 +16,13 @@ public:
 	// Sets default values for this actor's properties
 	ASpeechManager();
 
-	bool GetIsConversationOnGoing() {return bIsConversationOnGoing;}
-	bool GetHasNetworkForConversationBeenSet() {return bHasNetworkForConversationBeenSet;}
-	bool GetbProcessIsAlive() {return bProcessIsAlive;}
-
-	AActor* SpeakerOne = nullptr;
-	AActor* SpeakerTwo = nullptr;
-
-protected:
-
-
-	UCustomConversationGenerator* SpeakerOneComponent;
-
-	UCustomConversationGenerator* SpeakerTwoComponent;
-
-	bool bProcessIsAlive = false;
-	bool bHasNetworkForConversationBeenSet = false;
-	bool bIsConversationOnGoing = false;
-	bool bForceSpeakerOneTalk = true;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	FString RandomConversationCategorySelector();
 
-	void MediateConversation();
-	bool SpeakerOneIsSpeaking();
-	bool SpeakerTwoIsSpeaking();
-	bool IsConversationOnGoing();
-
-
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	bool RequestJoinConversation(AActor* IncomingActor);
-
-
-	bool SettingUpNetworkForConversation();
-
-	void EmergencyKillAudio();
 
 
 };
