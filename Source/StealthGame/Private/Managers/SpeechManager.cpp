@@ -199,12 +199,8 @@ bool ASpeechManager::IsConversationOnGoing()
 		SpeakerTwo = nullptr;
 		SpeakerOneComponent->AudioPlayer->Sound = nullptr;
 		SpeakerTwoComponent->AudioPlayer->Sound = nullptr;
-
 		bProcessIsAlive = false;
-		bHasNetworkForConversationBeenSet = false;
 		bIsConversationOnGoing = false;
-		bForceSpeakerOneTalk = true;
-
 		UE_LOG(LogTemp, Warning, TEXT("Finished"));
 		return false;
 
