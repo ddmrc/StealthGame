@@ -323,7 +323,7 @@ void AEnemyAIController::Tick(float DeltaTime)
 			float TimeToDetectAllies = 7.f;
 			GetWorld()->GetTimerManager().ClearTimer(DetectAlliesTimer);
 			GetWorld()->GetTimerManager().SetTimer(DetectAlliesTimer, TimerDetectAllies, TimeToDetectAllies, false);
-			//SpeechManager->EmergencyKillAudio();
+			SpeechManager->EmergencyKillAudio();
 			SetAIState(EAIStates::Patrol);
 		}
 	}

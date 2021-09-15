@@ -238,7 +238,7 @@ void UCustomConversationGenerator::ToggleThroughPhrases()
 		{
 			AudioPlayer->SetSound(Conversation[2]);
 			Conversation[2] = nullptr;
-			
+			UE_LOG(LogTemp, Warning, TEXT("Deleting Conversation 2"));
 
 		}
 
