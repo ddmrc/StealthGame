@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "Props/FinishLine.h"
-#include "Managers/SpeechManager.h"
 #include "StealthGameModeBase.generated.h"
 
 /**
@@ -27,7 +26,7 @@ public:
 
 	virtual void BeginPlay() override;
 	AFinishLine* FinishLine = nullptr;
-	ASpeechManager* SpeechManager = nullptr;
+
 
 protected:
 

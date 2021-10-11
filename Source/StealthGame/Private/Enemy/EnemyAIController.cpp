@@ -38,15 +38,12 @@ void AEnemyAIController::SetUpPointerVariables()
 		}
 	}
 
-	if (SpeechManager == nullptr)
+	if (DialogComponent == nullptr)
 	{
-		SpeechManager = Cast< AStealthGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()))->SpeechManager;
-
-		if (!SpeechManager)
-		{
-			UE_LOG(LogTemp, Error, TEXT("Speech Manager Reference Not Detected In EnemyAIController.h (49)"));
-		}
+		DialogComponent = GetCharacter()->FindComponentByClass<UDialogComponent>();
 	}
+
+
 
 }
 
@@ -467,5 +464,10 @@ void AEnemyAIController::ToggleDetectAllies(bool bState)
 {
 	bIgnoreSenseFromAllies = bState;
 
+}
+
+UDialogComponent* AEnemyAIController::GetDialogComponent()
+{
+	return DialogComponent;
 }
 

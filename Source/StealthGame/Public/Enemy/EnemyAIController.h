@@ -9,6 +9,7 @@
 #include "Player/MyPlayerCharacter.h"
 #include "GenericTeamAgentInterface.h"
 #include "AIComponents/Navigation/SpawnAITargetLocationHandler.h"
+#include "AIComponents/Conversation/DialogComponent.h"
 #include "GameMode/StealthGameModeBase.h"
 #include "EnemyAIController.generated.h"
 
@@ -59,13 +60,17 @@ public:
 	UFUNCTION()
 	EAIStates RequestGetAIState();
 
+
+	UFUNCTION()
+	UDialogComponent* GetDialogComponent();
+
 protected:
 
 	/*VARIABLES*/
 	AActor* ActorTriggeredStimulus = nullptr;
 	AMyPlayerCharacter* PlayerCharacter = nullptr;
-	ASpeechManager* SpeechManager = nullptr;
 	ASpawnAITargetLocationHandler* SpawnTargetLocationHandler = nullptr;
+	UDialogComponent* DialogComponent = nullptr;
 
 
 	UPROPERTY(EditAnywhere)
