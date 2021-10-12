@@ -16,13 +16,27 @@ class STEALTHGAME_API ADialogManager : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ADialogManager();
+	void SetUpAIPointerReference(AEnemyAIController* Controller, int32 PatrolGuardID);
+	bool CheckAIControllerReferenceByIndex(int32 PatrolGuardID);
 
+
+	void SetUpConversationForController(int32 PatrolGuardID);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	AEnemyAIController* EnemyController = nullptr;
+	AEnemyAIController* ControllerPatrolGuard1 = nullptr;
+	AEnemyAIController* ControllerPatrolGuard2 = nullptr;
+
+	UDialogComponent* DialogComponentPatrolGuard1 = nullptr;
+	UDialogComponent* DialogComponentPatrolGuard2 = nullptr;
+
+	TArray<USoundCue*> ConversationPatrolGuard1;
+	TArray<USoundCue*> ConversationPatrolGuard2;
+
 	void DebugDialog();
+
+	int32 PatrolGuardIDToTalk = 1;
 
 public:	
 	// Called every frame

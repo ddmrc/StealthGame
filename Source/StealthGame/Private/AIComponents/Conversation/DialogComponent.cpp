@@ -23,6 +23,12 @@ void UDialogComponent::BeginPlay()
 	{
 		AudioComponent = GetOwner()->FindComponentByClass<UCustomAudioComponent>();
 	}
+
+	if (AudioComponent)
+	{
+		AudioComponent->OnAudioFinished.AddDynamic(this, &UDialogComponent::NotifyLineIsFinishedPlaying);
+
+	}
 	
 }
 
@@ -43,6 +49,7 @@ bool UDialogComponent::PlayDialogLine(USoundCue* DialogLineAudio)
 		{
 			AudioComponent->Sound = DialogLineAudio;
 			AudioComponent->Play(0, 500, true, true);
+			bIsCurrentlyTalking = true;
 			return true;
 		}
 	}
@@ -64,4 +71,9 @@ USoundCue* UDialogComponent::GetRandSoundBasedOnTag(TArray<FDialogLine>Bank, FSt
 	int32 RandomSelection = FMath::RandRange(0, ValidSounds.Num() - 1);
 
 	return ValidSounds[RandomSelection];
+}
+
+void UDialogComponent::NotifyLineIsFinishedPlaying()
+{
+	bIsCurrentlyTalking = false;
 }

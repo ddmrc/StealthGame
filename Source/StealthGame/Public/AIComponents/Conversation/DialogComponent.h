@@ -34,16 +34,20 @@ public:
 	TArray<FDialogLine> DefaultBank;
 
 	bool PlayDialogLine(USoundCue* DialogLineAudio);
-
+	bool GetIsCurrentlyTalking() { return bIsCurrentlyTalking; }
 	USoundCue* GetRandSoundBasedOnTag(TArray<FDialogLine>Bank,FString Tag);
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void NotifyLineIsFinishedPlaying();
+
+
 	UCustomAudioComponent* AudioComponent = nullptr;
 
-
+	bool bIsCurrentlyTalking = false;
 
 public:	
 	// Called every frame

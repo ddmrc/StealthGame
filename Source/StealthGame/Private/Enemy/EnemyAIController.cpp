@@ -44,7 +44,6 @@ void AEnemyAIController::SetUpPointerVariables()
 	}
 
 
-
 }
 
 void AEnemyAIController::BindingFunctions()
