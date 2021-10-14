@@ -35,6 +35,9 @@ protected:
 	void SetUpAIPointers();
 	void SetUpDialogManager();
 
+	void DebugAIState();
+	bool bDebugNeedsReset = false;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

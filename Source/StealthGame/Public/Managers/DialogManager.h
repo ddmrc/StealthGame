@@ -17,10 +17,10 @@ public:
 	// Sets default values for this actor's properties
 	ADialogManager();
 	void SetUpAIPointerReference(AEnemyAIController* Controller, int32 PatrolGuardID);
+
 	bool CheckAIControllerReferenceByIndex(int32 PatrolGuardID);
 
-
-	void SetUpConversationForController(int32 PatrolGuardID);
+	void SetUpConversationForController(int32 PatrolGuardID, FString Topic);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -37,6 +37,8 @@ protected:
 	void DebugDialog();
 
 	int32 PatrolGuardIDToTalk = 1;
+
+	void RunThroughConversation(int32 NumberOfLinesToSpeak);
 
 public:	
 	// Called every frame

@@ -50,56 +50,16 @@ void ADialogManager::Tick(float DeltaTime)
 
 	if (GDialogOption == 4)
 	{
-		SetUpConversationForController(1);
-		SetUpConversationForController(2);
+		FString Topic = "Default";
+		SetUpConversationForController(1, Topic);
+		SetUpConversationForController(2, Topic);
 		GDialogOption = 0;
 
 	}
 	else if (GDialogOption == 5)
 	{
-		if (ConversationPatrolGuard1.Num() > 0 && PatrolGuardIDToTalk == 1)
-		{
-			if (ConversationPatrolGuard1[0] != nullptr && !DialogComponentPatrolGuard2->GetIsCurrentlyTalking())
-			{
-				DialogComponentPatrolGuard1->PlayDialogLine(ConversationPatrolGuard1[0]);
-				ConversationPatrolGuard1[0] = nullptr;
-				PatrolGuardIDToTalk = 2;
-			}
-			else if (ConversationPatrolGuard1[1] != nullptr && !DialogComponentPatrolGuard2->GetIsCurrentlyTalking())
-			{
-				DialogComponentPatrolGuard1->PlayDialogLine(ConversationPatrolGuard1[1]);
-				ConversationPatrolGuard1[1] = nullptr;
-				PatrolGuardIDToTalk = 2;
-			}
-			else if (ConversationPatrolGuard1[2] != nullptr && !DialogComponentPatrolGuard2->GetIsCurrentlyTalking())
-			{
-				DialogComponentPatrolGuard1->PlayDialogLine(ConversationPatrolGuard1[2]);
-				ConversationPatrolGuard1[2] = nullptr;
-				PatrolGuardIDToTalk = 2;
-			}
-		}
-		else if (ConversationPatrolGuard2.Num() > 0 && PatrolGuardIDToTalk == 2)
-		{
-			
-			if (ConversationPatrolGuard2[0] != nullptr &&!DialogComponentPatrolGuard1->GetIsCurrentlyTalking())
-			{
-				DialogComponentPatrolGuard2->PlayDialogLine(ConversationPatrolGuard2[0]);
-				ConversationPatrolGuard2[0] = nullptr;
-				PatrolGuardIDToTalk = 1;
-			}
-			else if (ConversationPatrolGuard2[1] != nullptr && !DialogComponentPatrolGuard1->GetIsCurrentlyTalking())
-			{
-				DialogComponentPatrolGuard2->PlayDialogLine(ConversationPatrolGuard2[1]);
-				ConversationPatrolGuard2[1] = nullptr;
-				PatrolGuardIDToTalk = 1;
-			}
-			else if (ConversationPatrolGuard2[2] != nullptr && !DialogComponentPatrolGuard1->GetIsCurrentlyTalking())
-			{
-				DialogComponentPatrolGuard2->PlayDialogLine(ConversationPatrolGuard2[2]);
-				ConversationPatrolGuard2[2] = nullptr;
-				PatrolGuardIDToTalk = 1;
-			}
-		}
+		int32 NumberOfLinesToSay = 3;
+		RunThroughConversation(NumberOfLinesToSay);
 	}
 }
 
@@ -176,7 +136,7 @@ bool ADialogManager::CheckAIControllerReferenceByIndex(int32 PatrolGuardID)
 	return false;
 }
 
-void ADialogManager::SetUpConversationForController(int32 PatrolGuardID)
+void ADialogManager::SetUpConversationForController(int32 PatrolGuardID, FString Topic)
 {
 	USoundCue* Line1;
 	USoundCue* Line2;
@@ -184,7 +144,7 @@ void ADialogManager::SetUpConversationForController(int32 PatrolGuardID)
 	switch (PatrolGuardID)
 	{
 	case 1:
-		if (DialogComponentPatrolGuard1)
+		if (DialogComponentPatrolGuard1 && Topic == "Default")
 		{
 			Line1 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Greeting");
 			Line2 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Inquire");
@@ -220,4 +180,54 @@ void ADialogManager::SetUpConversationForController(int32 PatrolGuardID)
 		break;
 	}
 
+}
+
+void ADialogManager::RunThroughConversation(int32 NumberOfLinesToSpeak)
+{
+	if (NumberOfLinesToSpeak == 3)
+	{
+		if (ConversationPatrolGuard1.Num() > 0 && PatrolGuardIDToTalk == 1)
+		{
+			if (ConversationPatrolGuard1[0] != nullptr && !DialogComponentPatrolGuard2->GetIsCurrentlyTalking())
+			{
+				DialogComponentPatrolGuard1->PlayDialogLine(ConversationPatrolGuard1[0]);
+				ConversationPatrolGuard1[0] = nullptr;
+				PatrolGuardIDToTalk = 2;
+			}
+			else if (ConversationPatrolGuard1[1] != nullptr && !DialogComponentPatrolGuard2->GetIsCurrentlyTalking())
+			{
+				DialogComponentPatrolGuard1->PlayDialogLine(ConversationPatrolGuard1[1]);
+				ConversationPatrolGuard1[1] = nullptr;
+				PatrolGuardIDToTalk = 2;
+			}
+			else if (ConversationPatrolGuard1[2] != nullptr && !DialogComponentPatrolGuard2->GetIsCurrentlyTalking())
+			{
+				DialogComponentPatrolGuard1->PlayDialogLine(ConversationPatrolGuard1[2]);
+				ConversationPatrolGuard1[2] = nullptr;
+				PatrolGuardIDToTalk = 2;
+			}
+		}
+		else if (ConversationPatrolGuard2.Num() > 0 && PatrolGuardIDToTalk == 2)
+		{
+
+			if (ConversationPatrolGuard2[0] != nullptr && !DialogComponentPatrolGuard1->GetIsCurrentlyTalking())
+			{
+				DialogComponentPatrolGuard2->PlayDialogLine(ConversationPatrolGuard2[0]);
+				ConversationPatrolGuard2[0] = nullptr;
+				PatrolGuardIDToTalk = 1;
+			}
+			else if (ConversationPatrolGuard2[1] != nullptr && !DialogComponentPatrolGuard1->GetIsCurrentlyTalking())
+			{
+				DialogComponentPatrolGuard2->PlayDialogLine(ConversationPatrolGuard2[1]);
+				ConversationPatrolGuard2[1] = nullptr;
+				PatrolGuardIDToTalk = 1;
+			}
+			else if (ConversationPatrolGuard2[2] != nullptr && !DialogComponentPatrolGuard1->GetIsCurrentlyTalking())
+			{
+				DialogComponentPatrolGuard2->PlayDialogLine(ConversationPatrolGuard2[2]);
+				ConversationPatrolGuard2[2] = nullptr;
+				PatrolGuardIDToTalk = 1;
+			}
+		}
+	}
 }
