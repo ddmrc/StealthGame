@@ -43,6 +43,8 @@ void AAIManager::Tick(float DeltaTime)
 	SetUpAIPointers();
 	SetUpDialogManager();
 
+	DialogMechanic();
+
 
 	DebugAIState();
 
@@ -210,11 +212,13 @@ void AAIManager::DebugAIState()
 	case 8:
 		if (ControllerPatrolGuard1 && ControllerPatrolGuard1->CurrentAIState != EAIStates::Conversation)
 		{
+			ControllerPatrolGuard1->SetWantsToStartConversation(true);
 			ControllerPatrolGuard1->SetAIState(EAIStates::Conversation);
 			ControllerPatrolGuard1->FindComponentByClass<UAIPerceptionComponent>()->Deactivate();
 		}
 		if (ControllerPatrolGuard2 && ControllerPatrolGuard2->CurrentAIState != EAIStates::Conversation)
 		{
+			ControllerPatrolGuard2->SetWantsToStartConversation(true);
 			ControllerPatrolGuard2->SetAIState(EAIStates::Conversation);
 			ControllerPatrolGuard2->FindComponentByClass<UAIPerceptionComponent>()->Deactivate();
 		}
@@ -255,5 +259,64 @@ void AAIManager::DebugAIState()
 		}
 		bDebugNeedsReset = true;
 		break;
+	}
+}
+
+bool AAIManager::CheckIfAnyAIWantsConversation()
+{
+	bool bGPatrolGuard1WantsConversation = false;
+	bool bGPatrolGuard2WantsConversation = false;
+	if (ControllerPatrolGuard1 && ControllerPatrolGuard1->GetWantsToStartConversation())
+	{
+		bGPatrolGuard1WantsConversation = true;
+		
+	}
+
+	if (ControllerPatrolGuard2 && ControllerPatrolGuard2->GetWantsToStartConversation())
+	{
+		bGPatrolGuard2WantsConversation = true;
+	}
+
+	if (bGPatrolGuard1WantsConversation && bGPatrolGuard2WantsConversation)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void AAIManager::DialogMechanic()
+{
+	if (CheckIfAnyAIWantsConversation())
+	{
+		ControllerPatrolGuard1->SetAIState(EAIStates::Conversation);
+		ControllerPatrolGuard2->SetAIState(EAIStates::Conversation);
+
+		DialogManager->SetUpConversationForController(1, "Default");
+		DialogManager->SetUpConversationForController(2, "Default");
+
+
+
+		ControllerPatrolGuard1->SetWantsToStartConversation(false);
+		ControllerPatrolGuard2->SetWantsToStartConversation(false);
+	}
+
+	if (DialogManager->HasAnyAIHaveConversationLeft())
+	{
+		DialogManager->RunThroughConversation(3);
+	}
+
+	if (DialogManager->NotifyConversationHasEnded())
+	{
+		if (ControllerPatrolGuard1->CurrentAIState == EAIStates::Conversation)
+		{
+			ControllerPatrolGuard1->SetAIState(EAIStates::Patrol);
+
+		}
+
+		if (ControllerPatrolGuard2->CurrentAIState == EAIStates::Conversation)
+		{
+			ControllerPatrolGuard2->SetAIState(EAIStates::Patrol);
+		}
 	}
 }

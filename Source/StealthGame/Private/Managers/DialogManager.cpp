@@ -138,6 +138,8 @@ bool ADialogManager::CheckAIControllerReferenceByIndex(int32 PatrolGuardID)
 
 void ADialogManager::SetUpConversationForController(int32 PatrolGuardID, FString Topic)
 {
+	bHasConversationEnded = false;
+
 	USoundCue* Line1;
 	USoundCue* Line2;
 	USoundCue* Line3;
@@ -159,6 +161,8 @@ void ADialogManager::SetUpConversationForController(int32 PatrolGuardID, FString
 		ConversationPatrolGuard1.Add(Line1);
 		ConversationPatrolGuard1.Add(Line2);
 		ConversationPatrolGuard1.Add(Line3);
+
+		PatrolGuard1HasLinesLeft = true;
 		break;
 
 	case 2:
@@ -177,6 +181,8 @@ void ADialogManager::SetUpConversationForController(int32 PatrolGuardID, FString
 		ConversationPatrolGuard2.Add(Line1);
 		ConversationPatrolGuard2.Add(Line2);
 		ConversationPatrolGuard2.Add(Line3);
+
+		PatrolGuard2HasLinesLeft = true;
 		break;
 	}
 
@@ -205,6 +211,8 @@ void ADialogManager::RunThroughConversation(int32 NumberOfLinesToSpeak)
 				DialogComponentPatrolGuard1->PlayDialogLine(ConversationPatrolGuard1[2]);
 				ConversationPatrolGuard1[2] = nullptr;
 				PatrolGuardIDToTalk = 2;
+				PatrolGuard1HasLinesLeft = false;
+
 			}
 		}
 		else if (ConversationPatrolGuard2.Num() > 0 && PatrolGuardIDToTalk == 2)
@@ -227,7 +235,35 @@ void ADialogManager::RunThroughConversation(int32 NumberOfLinesToSpeak)
 				DialogComponentPatrolGuard2->PlayDialogLine(ConversationPatrolGuard2[2]);
 				ConversationPatrolGuard2[2] = nullptr;
 				PatrolGuardIDToTalk = 1;
+
+				PatrolGuard2HasLinesLeft = false;
+
 			}
 		}
 	}
+
+	if (!PatrolGuard1HasLinesLeft && !PatrolGuard2HasLinesLeft)
+	{
+		bHasConversationEnded = true;
+	}
 }
+
+bool ADialogManager::GetIfAConversationIsReadyToStart() 
+{
+	if (PatrolGuard1ConversationReady && PatrolGuard2ConversationReady)
+	{
+		return true;
+	}
+	return false;
+}
+
+bool ADialogManager::HasAnyAIHaveConversationLeft()
+{
+	if (PatrolGuard1HasLinesLeft || PatrolGuard2HasLinesLeft)
+	{
+		return true;
+	}
+
+	return false;
+}
+

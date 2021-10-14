@@ -64,6 +64,9 @@ public:
 	UFUNCTION()
 	UDialogComponent* GetDialogComponent();
 
+	bool GetWantsToStartConversation() { return bWantsToStartConversation; }
+	void SetWantsToStartConversation(bool bWantToStartConversation) {  bWantsToStartConversation = bWantToStartConversation; }
+
 protected:
 
 	/*VARIABLES*/
@@ -79,7 +82,7 @@ protected:
 	bool bSearchPointNeedsUpdate = false;
 	bool bWantToSetPatrolTimer = true;
 	bool bIgnoreSenseFromAllies = false;
-
+	bool bWantsToStartConversation = false;
 	FTimerHandle DetectedTimer;
 	FTimerHandle SearchTimer;
 	FTimerHandle PatrolTimer;
@@ -115,4 +118,20 @@ protected:
 
 	//DEBUG
 	bool DebugSpeech = true;
+
+	void CheckAIStateToSetBehaviour();
+
+	void PatrolBehaviour();
+
+	void SearchingBehaviour();
+
+	void LookingAroundBehaviour();
+
+	void ChasingBehaviour();
+
+	void DetectedBehaviour();
+
+	void ConfusedBehaviour();
+
+	void ConversationBehaviour();
 };

@@ -21,6 +21,14 @@ public:
 	bool CheckAIControllerReferenceByIndex(int32 PatrolGuardID);
 
 	void SetUpConversationForController(int32 PatrolGuardID, FString Topic);
+
+	bool GetIfAConversationIsReadyToStart();
+
+	bool HasAnyAIHaveConversationLeft();
+
+	bool NotifyConversationHasEnded() { return bHasConversationEnded; }
+
+	void RunThroughConversation(int32 NumberOfLinesToSpeak);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -38,7 +46,13 @@ protected:
 
 	int32 PatrolGuardIDToTalk = 1;
 
-	void RunThroughConversation(int32 NumberOfLinesToSpeak);
+	bool PatrolGuard1ConversationReady = false;
+	bool PatrolGuard2ConversationReady = false;
+
+	bool PatrolGuard1HasLinesLeft = false;
+	bool PatrolGuard2HasLinesLeft = false;
+
+	bool bHasConversationEnded = false;
 
 public:	
 	// Called every frame

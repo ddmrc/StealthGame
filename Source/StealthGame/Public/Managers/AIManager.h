@@ -35,6 +35,10 @@ protected:
 	void SetUpAIPointers();
 	void SetUpDialogManager();
 
+	bool CheckIfAnyAIWantsConversation();
+
+	void DialogMechanic();
+
 	void DebugAIState();
 	bool bDebugNeedsReset = false;
 
