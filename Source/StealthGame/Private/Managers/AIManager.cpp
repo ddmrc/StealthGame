@@ -13,7 +13,7 @@ static int32 GForceAIState = 0;
 static FAutoConsoleVariableRef CVarShowSoundEvents(
 	TEXT("Stealth.Debug.ForceAIState"),
 	GForceAIState,
-	TEXT("0 = Default Behaviour, 1 = Idle, 2 = Patrol, 3 = Chase, 4= LookAround,5= Search,6= Detected, 7= Conversation, 8= Disable Sight,9= Disable Hearing, 10= Disable All Senses"),
+	TEXT("0 = Default Behaviour, 1 = Idle, 2 = Patrol, 3 = Chase, 4= LookAround,5= Search,6= Confused,7= Detected, 8= Conversation, Disable Sense 9= Sight,10= Hearing, 11= All"),
 	ECVF_Cheat
 );
 
@@ -31,23 +31,7 @@ void AAIManager::BeginPlay()
 {
 	Super::BeginPlay();
 	
-
-
-
-
-	//if (ControllerPatrolGuard1 && PatrolGuard1)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("Guard1"));
-	//}
-
-	//if (ControllerPatrolGuard2 && PatrolGuard2)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("Guard2"));
-	//}
-	//if (DialogManager)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("DialogManager Set"));
-	//}
+	GForceAIState = 0;
 
 }
 
@@ -198,6 +182,19 @@ void AAIManager::DebugAIState()
 		bDebugNeedsReset = true;
 		break;
 	case 6:
+		if (ControllerPatrolGuard1 && ControllerPatrolGuard1->CurrentAIState != EAIStates::Confused)
+		{
+			ControllerPatrolGuard1->SetAIState(EAIStates::Confused);
+			ControllerPatrolGuard1->FindComponentByClass<UAIPerceptionComponent>()->Deactivate();
+		}
+		if (ControllerPatrolGuard2 && ControllerPatrolGuard2->CurrentAIState != EAIStates::Confused)
+		{
+			ControllerPatrolGuard2->SetAIState(EAIStates::Confused);
+			ControllerPatrolGuard2->FindComponentByClass<UAIPerceptionComponent>()->Deactivate();
+		}
+		bDebugNeedsReset = true;
+		break;
+	case 7:
 		if (ControllerPatrolGuard1 && ControllerPatrolGuard1->CurrentAIState != EAIStates::Detected)
 		{
 			ControllerPatrolGuard1->SetAIState(EAIStates::Detected);
@@ -210,7 +207,7 @@ void AAIManager::DebugAIState()
 		}
 		bDebugNeedsReset = true;
 		break;
-	case 7:
+	case 8:
 		if (ControllerPatrolGuard1 && ControllerPatrolGuard1->CurrentAIState != EAIStates::Conversation)
 		{
 			ControllerPatrolGuard1->SetAIState(EAIStates::Conversation);
@@ -223,7 +220,7 @@ void AAIManager::DebugAIState()
 		}
 		bDebugNeedsReset = true;
 		break;
-	case 8:
+	case 9:
 		if (ControllerPatrolGuard1)
 		{	
 			ControllerPatrolGuard1->FindComponentByClass<UAIPerceptionComponent>()->SetSenseEnabled(UAISense_Sight::StaticClass(),false);
@@ -234,7 +231,7 @@ void AAIManager::DebugAIState()
 		}
 		bDebugNeedsReset = true;
 		break;
-	case 9:
+	case 10:
 		if (ControllerPatrolGuard1)
 		{
 			ControllerPatrolGuard1->FindComponentByClass<UAIPerceptionComponent>()->SetSenseEnabled(UAISense_Hearing::StaticClass(), false);
@@ -245,7 +242,7 @@ void AAIManager::DebugAIState()
 		}
 		bDebugNeedsReset = true;
 		break;
-	case 10:
+	case 11:
 		if (ControllerPatrolGuard1)
 		{
 			ControllerPatrolGuard1->FindComponentByClass<UAIPerceptionComponent>()->SetSenseEnabled(UAISense_Sight::StaticClass(), false);
