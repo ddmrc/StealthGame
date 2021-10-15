@@ -30,8 +30,13 @@ void AEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
+	if (ThisController == nullptr)
+	{
+		ThisController = Cast<AEnemyAIController>(GetController());
+		CurrentMovementState = EMovementState::Idle;
+	}
 	UpdateMovementState();
+
 	/*FString NM;
 	GetName(NM);
 	UE_LOG(LogTemp, Warning, TEXT("This Character: %s"), *NM);*/
@@ -48,7 +53,7 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void AEnemyCharacter::UpdateMovementState()
 {
-	AEnemyAIController* ThisController = Cast<AEnemyAIController>(GetController());
+	
 	
 	//if (ThisController->CurrentAIState == EAIStates::Searching && GetVelocity() == FVector::ZeroVector)
 	//{
@@ -56,62 +61,63 @@ void AEnemyCharacter::UpdateMovementState()
 	//	CurrentMovementState = EMovementState::StaticSearch;
 	//	return;
 	//}
+	if (ThisController)
+	{
+		if (ThisController->CurrentAIState == EAIStates::Idle && CurrentMovementState != EMovementState::Idle)
+		{
+			CurrentMovementState = EMovementState::Idle;
+		}
+		else if (ThisController->CurrentAIState == EAIStates::Patrol && CurrentMovementState != EMovementState::Walking)
+		{
 
-	if (ThisController->CurrentAIState == EAIStates::Idle && CurrentMovementState != EMovementState::Idle)
-	{
-		CurrentMovementState = EMovementState::Idle;
-	}
-	else if (ThisController->CurrentAIState == EAIStates::Patrol  && CurrentMovementState != EMovementState::Walking)
-	{
-			
 			CurrentMovementState = EMovementState::Walking;
 
 
-	}
-	else if (ThisController->CurrentAIState == EAIStates::Searching)
-	{
-		if (GetVelocity() == FVector::ZeroVector)
+		}
+		else if (ThisController->CurrentAIState == EAIStates::Searching)
+		{
+			if (GetVelocity() == FVector::ZeroVector)
+			{
+				CurrentMovementState = EMovementState::StaticSearch;
+				return;
+			}
+			else if (bForceRun)
+			{
+				//Nothing, keep Running
+				CurrentMovementState = EMovementState::Running;
+				return;
+			}
+			else if (CurrentMovementState == EMovementState::Walking && !bForceRun)
+			{
+				//Nothing, keep Walking
+				CurrentMovementState = EMovementState::Walking;
+			}
+
+			else
+			{
+				//Emergency change state to walking
+				CurrentMovementState = EMovementState::Walking;
+			}
+		}
+		else if (ThisController->CurrentAIState == EAIStates::Chasing && CurrentMovementState != EMovementState::Running)
+		{
+			CurrentMovementState = EMovementState::Running;
+			bForceRun = true;
+		}
+		else if ((ThisController->CurrentAIState == EAIStates::Detected || ThisController->CurrentAIState == EAIStates::Confused) && CurrentMovementState != EMovementState::Stopped)
+		{
+			CurrentMovementState = EMovementState::Stopped;
+			if (ThisController->CurrentAIState == EAIStates::Confused)
+			{
+				bForceRun = false;
+			}
+		}
+		else if (ThisController->CurrentAIState == EAIStates::LookingAround)
 		{
 			CurrentMovementState = EMovementState::StaticSearch;
-			return;
-		}
-		else if (bForceRun)
-		{
-			//Nothing, keep Running
-			CurrentMovementState = EMovementState::Running;
-			return;
-		}
-		else if (CurrentMovementState == EMovementState::Walking && !bForceRun)
-		{
-			//Nothing, keep Walking
-			CurrentMovementState = EMovementState::Walking;
 		}
 
-		else
-		{
-			//Emergency change state to walking
-			CurrentMovementState = EMovementState::Walking;
-		}
 	}
-	else if (ThisController->CurrentAIState == EAIStates::Chasing && CurrentMovementState != EMovementState::Running)
-	{
-		CurrentMovementState = EMovementState::Running;
-		bForceRun = true;
-	}
-	else if ((ThisController->CurrentAIState == EAIStates::Detected || ThisController->CurrentAIState == EAIStates::Confused) && CurrentMovementState != EMovementState::Stopped)
-	{
-		CurrentMovementState = EMovementState::Stopped;
-		if (ThisController->CurrentAIState == EAIStates::Confused)
-		{
-			bForceRun = false;
-		}
-	}
-	else if (ThisController->CurrentAIState == EAIStates::LookingAround)
-	{
-		CurrentMovementState = EMovementState::StaticSearch;
-	}
-	
-
 
 }
 

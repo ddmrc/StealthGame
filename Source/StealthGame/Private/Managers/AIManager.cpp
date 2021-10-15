@@ -23,7 +23,19 @@ AAIManager::AAIManager()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	ConstructorHelpers::FObjectFinder<UBlueprint> ItemBlueprint(TEXT("Blueprint'/Game/StealhGame/Blueprints/Managers/DialogManager_BP.DialogManager_BP'"));
+	if (ItemBlueprint.Object)
+	{
 
+		MyItemBlueprint = (UClass*)ItemBlueprint.Object->GeneratedClass;
+	}
+
+	ConstructorHelpers::FObjectFinder<UBlueprint> ItemBlueprint2(TEXT("Blueprint'/Game/StealhGame/Blueprints/Characters/AICharacter_BP.AICharacter_BP'"));
+	if (ItemBlueprint2.Object)
+	{
+
+		MyItemBlueprint2 = (UClass*)ItemBlueprint2.Object->GeneratedClass;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -41,7 +53,7 @@ void AAIManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	SetUpAIPointers();
-	SetUpDialogManager();
+	//SetUpDialogManager();
 
 	DialogMechanic();
 
@@ -287,36 +299,93 @@ bool AAIManager::CheckIfAnyAIWantsConversation()
 
 void AAIManager::DialogMechanic()
 {
-	if (CheckIfAnyAIWantsConversation())
-	{
-		ControllerPatrolGuard1->SetAIState(EAIStates::Conversation);
-		ControllerPatrolGuard2->SetAIState(EAIStates::Conversation);
-
-		DialogManager->SetUpConversationForController(1, "Default");
-		DialogManager->SetUpConversationForController(2, "Default");
 
 
 
-		ControllerPatrolGuard1->SetWantsToStartConversation(false);
-		ControllerPatrolGuard2->SetWantsToStartConversation(false);
-	}
 
-	if (DialogManager->HasAnyAIHaveConversationLeft())
-	{
-		DialogManager->RunThroughConversation(3);
-	}
-
-	if (DialogManager->NotifyConversationHasEnded())
-	{
-		if (ControllerPatrolGuard1->CurrentAIState == EAIStates::Conversation)
+		if (CheckIfAnyAIWantsConversation())
 		{
-			ControllerPatrolGuard1->SetAIState(EAIStates::Patrol);
+			ControllerPatrolGuard1->SetAIState(EAIStates::Conversation);
+			ControllerPatrolGuard2->SetAIState(EAIStates::Conversation);
 
+			if (DialogManager == nullptr)
+			{
+				SpawnDialogManager();
+			}
+
+			if (DialogManager)
+			{
+				DialogManager->SetUpConversationForController(1, "Default");
+				DialogManager->SetUpConversationForController(2, "Default");
+			}
+
+
+
+
+			ControllerPatrolGuard1->SetWantsToStartConversation(false);
+			ControllerPatrolGuard2->SetWantsToStartConversation(false);
 		}
 
-		if (ControllerPatrolGuard2->CurrentAIState == EAIStates::Conversation)
+		if (DialogManager && DialogManager->HasAnyAIHaveConversationLeft())
 		{
-			ControllerPatrolGuard2->SetAIState(EAIStates::Patrol);
+			DialogManager->RunThroughConversation(3);
 		}
+
+		if (DialogManager && DialogManager->NotifyConversationHasEnded())
+		{
+			if (ControllerPatrolGuard1->CurrentAIState == EAIStates::Conversation)
+			{
+				ControllerPatrolGuard1->SetAIState(EAIStates::Patrol);
+
+			}
+
+			if (ControllerPatrolGuard2->CurrentAIState == EAIStates::Conversation)
+			{
+				ControllerPatrolGuard2->SetAIState(EAIStates::Patrol);
+			}
+
+			DialogManager->Destroy();
+			if (DialogManager != nullptr)
+			{
+				DialogManager = nullptr;
+			}
+		}
+	
+}
+
+void AAIManager::SpawnDialogManager()
+{
+	if (MyItemBlueprint)
+	{
+		FVector SpawnLocation = GetActorLocation();
+		FRotator SpawnRotation = GetActorRotation();
+		AActor* NewActor = GetWorld()->SpawnActor(MyItemBlueprint, &SpawnLocation, &SpawnRotation);
+
+		DialogManager = Cast<ADialogManager>(NewActor);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Class Not Detected to Spawn"));
+	}
+
+	if (DialogManager && !DialogManager->CheckAIControllerReferenceByIndex(1) && !DialogManager->CheckAIControllerReferenceByIndex(2))
+	{
+		DialogManager->SetUpAIPointerReference(ControllerPatrolGuard1, 1);
+		DialogManager->SetUpAIPointerReference(ControllerPatrolGuard2, 2);
+	}
+}
+
+void AAIManager::SpawnPatrolGuard(FVector Location, FRotator Rotation)
+{
+	if (MyItemBlueprint2)
+	{
+
+		AActor* NewActor = GetWorld()->SpawnActor(MyItemBlueprint2, &Location, &Rotation);
+
+
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Class Not Detected to Spawn"));
 	}
 }

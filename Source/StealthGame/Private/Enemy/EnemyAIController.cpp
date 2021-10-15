@@ -332,9 +332,9 @@ void AEnemyAIController::PatrolBehaviour()
 		{
 			
 
-			if (ActorTriggeredStimulus && ActorTriggeredStimulus->GetActorLocation().Equals(GetCharacter()->GetActorLocation(), 1000.f))
+			if (ActorTriggeredStimulus && ActorTriggeredStimulus->GetActorLocation().Equals(GetCharacter()->GetActorLocation(), 10000.f))
 			{
-				
+
 				bWantsToStartConversation = true;
 			}
 		}
@@ -516,7 +516,7 @@ void AEnemyAIController::ConversationBehaviour()
 	GetWorld()->GetTimerManager().PauseTimer(LookAroundTimer);
 	GetWorld()->GetTimerManager().PauseTimer(DetectAlliesTimer);
 
-	
+	//bWantsToStartConversation = false;
 }
 
 /*END BEHAVIOURS DIFFERENTES AI STATES*/

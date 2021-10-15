@@ -42,6 +42,12 @@ protected:
 	void DebugAIState();
 	bool bDebugNeedsReset = false;
 
+	TSubclassOf<ADialogManager> MyItemBlueprint;
+	TSubclassOf<AEnemyCharacter> MyItemBlueprint2;
+
+	void SpawnDialogManager();
+	void SpawnPatrolGuard(FVector Location,FRotator Rotation);
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
