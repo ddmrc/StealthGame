@@ -9,7 +9,7 @@ static int32 GDialogOption = 0;
 static FAutoConsoleVariableRef CVarShowSoundEvents(
 	TEXT("Stealth.Debug.ConversationEvents"),
 	GDialogOption,
-	TEXT("0 = stop, 1 = Greeting, 2 = Inquire, 3 = Goodbye, 4= SetUpConversation,5=PlayConversation"),
+	TEXT("0 = stop, 1 = Greeting, 2 = Inquire, 3 = Goodbye"),
 	ECVF_Cheat
 );
 
@@ -48,19 +48,19 @@ void ADialogManager::Tick(float DeltaTime)
 
 
 
-	if (GDialogOption == 4)
-	{
-		FString Topic = "Default";
-		SetUpConversationForController(1, Topic);
-		SetUpConversationForController(2, Topic);
-		GDialogOption = 0;
+	//if (GDialogOption == 4)
+	//{
+	//	FString Topic = "Default";
+	//	SetUpConversationForController(1, Topic);
+	//	SetUpConversationForController(2, Topic);
+	//	GDialogOption = 0;
 
-	}
-	else if (GDialogOption == 5)
-	{
-		int32 NumberOfLinesToSay = 3;
-		RunThroughConversation(NumberOfLinesToSay);
-	}
+	//}
+	//else if (GDialogOption == 5)
+	//{
+	//	int32 NumberOfLinesToSay = 3;
+	//	RunThroughConversation(NumberOfLinesToSay);
+	//}
 }
 
 void ADialogManager::DebugDialog()
