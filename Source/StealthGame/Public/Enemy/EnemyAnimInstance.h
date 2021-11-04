@@ -40,5 +40,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool IsAILookingAround();
 	UFUNCTION(BlueprintCallable)
+	bool IsAIHavingConversation();
+	UFUNCTION(BlueprintCallable)
 	bool IsAITalking();
 };

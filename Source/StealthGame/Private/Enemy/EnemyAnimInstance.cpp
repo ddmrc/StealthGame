@@ -168,3 +168,14 @@ bool UEnemyAnimInstance::IsAITalking()
 
 	return false;
 }
+bool UEnemyAnimInstance::IsAIHavingConversation()
+{
+	if (ThisCharacter)
+	{
+		if (GetCurrentAIState() == EAIStates::Conversation)
+		{
+			return true;
+		}
+	}
+	return false;
+}
