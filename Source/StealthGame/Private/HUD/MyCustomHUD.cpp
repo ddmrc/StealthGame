@@ -23,6 +23,8 @@ void AMyCustomHUD::BeginPlay()
 		}
 	}
 
+
+
 	if (AICharacter1 == nullptr || AICharacter2 == nullptr)
 	{
 		TArray<AActor*> ActorArray;
@@ -48,6 +50,8 @@ void AMyCustomHUD::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	ReadPlayerStealthState();
+
+
 
 }
 

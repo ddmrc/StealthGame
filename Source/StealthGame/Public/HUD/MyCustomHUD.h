@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "UI/PlayerInGameUIWidget.h"
 #include "Enemy/EnemyCharacter.h"
+#include "Managers/AIManager.h"
 #include "MyCustomHUD.generated.h"
 
 /**
@@ -30,6 +31,8 @@ public:
 
 	UPlayerInGameUIWidget* PlayerInGameUIWidget;
 
+	//AAIManager* AIManager = nullptr;
+
 	AEnemyCharacter* AICharacter1 = nullptr;
 	AEnemyCharacter* AICharacter2 = nullptr;
 
@@ -37,5 +40,5 @@ public:
 
 	int32 NumberOfAIEnemies = 0;
 
-
+	//void UpdateNumberOfEnemies();
 };

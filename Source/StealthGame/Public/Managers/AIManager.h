@@ -48,6 +48,8 @@ protected:
 	void SpawnDialogManager();
 	void SpawnPatrolGuard(FVector Location,FRotator Rotation);
 
+	void UpdatePlayerHeat();
+	bool bHasPlayerHeatBeenIncreased = false;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

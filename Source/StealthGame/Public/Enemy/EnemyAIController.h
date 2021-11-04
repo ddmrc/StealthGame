@@ -30,6 +30,14 @@ enum class EAIStates : uint8
 	Conversation,
 };
 
+UENUM()
+enum class EPlayerDetectionStatus : uint8
+{
+	NotDetected,
+	Detected,
+	HintOfLocation,
+};
+
 //DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FActorPerceptionUpdatedDelegate, AActor*, Actor, FAIStimulus, Stimulus);
 UCLASS()
 class STEALTHGAME_API AEnemyAIController : public AAIController
@@ -48,7 +56,13 @@ public:
 	EAIStates CurrentAIState;
 
 	UPROPERTY()
+	EPlayerDetectionStatus PlayerDetectionTag;
+
+	UPROPERTY()
 	bool bIsTalking;
+	UPROPERTY()
+	int32 PlayerHeat;
+
 
 	/*FUNCTIONS*/
 

@@ -82,7 +82,7 @@ void AEnemyAIController::BeginPlay()
 	SettingUpBlackBoard();
 
 	bIsTalking = false;
-
+	PlayerHeat = 0;
 }
 
 void AEnemyAIController::Tick(float DeltaTime)
@@ -92,6 +92,8 @@ void AEnemyAIController::Tick(float DeltaTime)
 	/*CHECK ON WHICH STATE AI IS IN*/
 	
 	CheckAIStateToSetBehaviour();
+
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *FString::FromInt(PlayerHeat));
 	
 }
 
@@ -276,21 +278,27 @@ void AEnemyAIController::CheckAIStateToSetBehaviour()
 	switch (CurrentAIState)
 	{
 	case EAIStates::Idle:
+		PlayerDetectionTag = EPlayerDetectionStatus::NotDetected;
 		break;
 	case EAIStates::Detected:
 		DetectedBehaviour();
+		PlayerDetectionTag = EPlayerDetectionStatus::Detected;
 		break;
 	case EAIStates::Chasing:
 		ChasingBehaviour();
+		PlayerDetectionTag = EPlayerDetectionStatus::Detected;
 		break;
 	case EAIStates::Patrol:
 		PatrolBehaviour();
+		PlayerDetectionTag = EPlayerDetectionStatus::NotDetected;
 		break;
 	case EAIStates::Confused:
 		ConfusedBehaviour();
+		PlayerDetectionTag = EPlayerDetectionStatus::NotDetected;
 		break;
 	case EAIStates::Searching:
 		SearchingBehaviour();
+		PlayerDetectionTag = EPlayerDetectionStatus::HintOfLocation;
 		break;
 	case EAIStates::LookingAround:
 		LookingAroundBehaviour();

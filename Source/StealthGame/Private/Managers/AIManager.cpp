@@ -60,6 +60,9 @@ void AAIManager::Tick(float DeltaTime)
 
 	DebugAIState();
 
+	UpdatePlayerHeat();
+
+
 }
 
 void AAIManager::SetUpAIPointers()
@@ -300,9 +303,6 @@ bool AAIManager::CheckIfAnyAIWantsConversation()
 void AAIManager::DialogMechanic()
 {
 
-
-
-
 		if (CheckIfAnyAIWantsConversation())
 		{
 			ControllerPatrolGuard1->SetAIState(EAIStates::Conversation);
@@ -387,5 +387,31 @@ void AAIManager::SpawnPatrolGuard(FVector Location, FRotator Rotation)
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Class Not Detected to Spawn"));
+	}
+}
+
+void AAIManager::UpdatePlayerHeat()
+{
+	if (ControllerPatrolGuard1 && ControllerPatrolGuard2)
+	{
+		if ((ControllerPatrolGuard1->PlayerDetectionTag == EPlayerDetectionStatus::Detected ||
+			ControllerPatrolGuard2->PlayerDetectionTag == EPlayerDetectionStatus::Detected) &&
+			!bHasPlayerHeatBeenIncreased)
+		{
+			if (ControllerPatrolGuard1->PlayerHeat < 3 && ControllerPatrolGuard2->PlayerHeat < 3)
+			{
+				ControllerPatrolGuard1->PlayerHeat++;
+				ControllerPatrolGuard2->PlayerHeat++;
+				bHasPlayerHeatBeenIncreased = true;
+			}
+
+			
+		}
+		else if (ControllerPatrolGuard1->PlayerDetectionTag == EPlayerDetectionStatus::NotDetected &&
+			ControllerPatrolGuard2->PlayerDetectionTag == EPlayerDetectionStatus::NotDetected &&
+			bHasPlayerHeatBeenIncreased)
+		{
+			bHasPlayerHeatBeenIncreased = false;
+		}
 	}
 }

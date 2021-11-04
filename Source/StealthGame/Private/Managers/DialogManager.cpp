@@ -71,9 +71,9 @@ void ADialogManager::DebugDialog()
 		UDialogComponent* DialogComponent = ControllerPatrolGuard1->GetDialogComponent();
 
 
-		USoundCue* Line1 = DialogComponent->GetRandSoundBasedOnTag(DialogComponent->DefaultBank, "Greeting");
-		USoundCue* Line2 = DialogComponent->GetRandSoundBasedOnTag(DialogComponent->DefaultBank, "Inquire");
-		USoundCue* Line3 = DialogComponent->GetRandSoundBasedOnTag(DialogComponent->DefaultBank, "Goodbye");
+		USoundCue* Line1 = DialogComponent->GetRandSoundBasedOnTag(DialogComponent->DefaultBank, "Greeting",ControllerPatrolGuard1->PlayerHeat);
+		USoundCue* Line2 = DialogComponent->GetRandSoundBasedOnTag(DialogComponent->DefaultBank, "Inquire", ControllerPatrolGuard1->PlayerHeat);
+		USoundCue* Line3 = DialogComponent->GetRandSoundBasedOnTag(DialogComponent->DefaultBank, "Goodbye", ControllerPatrolGuard1->PlayerHeat);
 		switch (GDialogOption)
 		{
 		case 0:
@@ -148,9 +148,9 @@ void ADialogManager::SetUpConversationForController(int32 PatrolGuardID, FString
 	case 1:
 		if (DialogComponentPatrolGuard1 && Topic == "Default")
 		{
-			Line1 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Greeting");
-			Line2 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Inquire");
-			Line3 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Goodbye");
+			Line1 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Greeting", ControllerPatrolGuard1->PlayerHeat);
+			Line2 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Inquire", ControllerPatrolGuard1->PlayerHeat);
+			Line3 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Goodbye", ControllerPatrolGuard1->PlayerHeat);
 		}
 
 
@@ -168,9 +168,9 @@ void ADialogManager::SetUpConversationForController(int32 PatrolGuardID, FString
 	case 2:
 		if (DialogComponentPatrolGuard2)
 		{
-			Line1 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag(DialogComponentPatrolGuard2->DefaultBank, "Greeting");
-			Line2 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag(DialogComponentPatrolGuard2->DefaultBank, "Inquire");
-			Line3 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag(DialogComponentPatrolGuard2->DefaultBank, "Goodbye");
+			Line1 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag(DialogComponentPatrolGuard2->DefaultBank, "Greeting", ControllerPatrolGuard2->PlayerHeat);
+			Line2 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag(DialogComponentPatrolGuard2->DefaultBank, "Inquire", ControllerPatrolGuard2->PlayerHeat);
+			Line3 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag(DialogComponentPatrolGuard2->DefaultBank, "Goodbye", ControllerPatrolGuard2->PlayerHeat);
 		}
 
 
