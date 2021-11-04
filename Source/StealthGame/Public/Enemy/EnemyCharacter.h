@@ -41,6 +41,8 @@ public:
 	void UpdateForceRun(bool bForce);
 
 	AEnemyAIController* ThisController = nullptr;
+
+	bool GetIsCharacterTalking();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

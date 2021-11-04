@@ -47,6 +47,9 @@ public:
 	UPROPERTY()
 	EAIStates CurrentAIState;
 
+	UPROPERTY()
+	bool bIsTalking;
+
 	/*FUNCTIONS*/
 
 	UFUNCTION()

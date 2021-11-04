@@ -39,4 +39,6 @@ public:
 	bool IsAIConfused();
 	UFUNCTION(BlueprintCallable)
 	bool IsAILookingAround();
+	UFUNCTION(BlueprintCallable)
+	bool IsAITalking();
 };

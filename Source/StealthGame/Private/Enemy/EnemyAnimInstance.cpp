@@ -154,3 +154,17 @@ bool UEnemyAnimInstance::IsAILookingAround()
 		return false;
 	}
 }
+
+bool UEnemyAnimInstance::IsAITalking()
+{
+	if (ThisCharacter)
+	{
+		if (ThisCharacter->GetIsCharacterTalking() == true)
+		{
+			return true;
+		}
+
+	}
+
+	return false;
+}

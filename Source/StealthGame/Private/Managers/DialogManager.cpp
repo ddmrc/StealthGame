@@ -199,12 +199,16 @@ void ADialogManager::RunThroughConversation(int32 NumberOfLinesToSpeak)
 				DialogComponentPatrolGuard1->PlayDialogLine(ConversationPatrolGuard1[0]);
 				ConversationPatrolGuard1[0] = nullptr;
 				PatrolGuardIDToTalk = 2;
+				ControllerPatrolGuard2->bIsTalking = false;
+				ControllerPatrolGuard1->bIsTalking = true;
 			}
 			else if (ConversationPatrolGuard1[1] != nullptr && !DialogComponentPatrolGuard2->GetIsCurrentlyTalking())
 			{
 				DialogComponentPatrolGuard1->PlayDialogLine(ConversationPatrolGuard1[1]);
 				ConversationPatrolGuard1[1] = nullptr;
 				PatrolGuardIDToTalk = 2;
+				ControllerPatrolGuard2->bIsTalking = false;
+				ControllerPatrolGuard1->bIsTalking = true;
 			}
 			else if (ConversationPatrolGuard1[2] != nullptr && !DialogComponentPatrolGuard2->GetIsCurrentlyTalking())
 			{
@@ -212,6 +216,8 @@ void ADialogManager::RunThroughConversation(int32 NumberOfLinesToSpeak)
 				ConversationPatrolGuard1[2] = nullptr;
 				PatrolGuardIDToTalk = 2;
 				PatrolGuard1HasLinesLeft = false;
+				ControllerPatrolGuard2->bIsTalking = false;
+				ControllerPatrolGuard1->bIsTalking = true;
 
 			}
 		}
@@ -223,12 +229,16 @@ void ADialogManager::RunThroughConversation(int32 NumberOfLinesToSpeak)
 				DialogComponentPatrolGuard2->PlayDialogLine(ConversationPatrolGuard2[0]);
 				ConversationPatrolGuard2[0] = nullptr;
 				PatrolGuardIDToTalk = 1;
+				ControllerPatrolGuard1->bIsTalking = false;
+				ControllerPatrolGuard2->bIsTalking = true;
 			}
 			else if (ConversationPatrolGuard2[1] != nullptr && !DialogComponentPatrolGuard1->GetIsCurrentlyTalking())
 			{
 				DialogComponentPatrolGuard2->PlayDialogLine(ConversationPatrolGuard2[1]);
 				ConversationPatrolGuard2[1] = nullptr;
 				PatrolGuardIDToTalk = 1;
+				ControllerPatrolGuard1->bIsTalking = false;
+				ControllerPatrolGuard2->bIsTalking = true;
 			}
 			else if (ConversationPatrolGuard2[2] != nullptr && !DialogComponentPatrolGuard1->GetIsCurrentlyTalking())
 			{
@@ -237,6 +247,8 @@ void ADialogManager::RunThroughConversation(int32 NumberOfLinesToSpeak)
 				PatrolGuardIDToTalk = 1;
 
 				PatrolGuard2HasLinesLeft = false;
+				ControllerPatrolGuard1->bIsTalking = false;
+				ControllerPatrolGuard2->bIsTalking = true;
 
 			}
 		}

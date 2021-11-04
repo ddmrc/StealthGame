@@ -145,3 +145,8 @@ void AEnemyCharacter::UpdateForceRun(bool bForce)
 	//to location
 	bForceRun = bForce;
 };
+
+bool AEnemyCharacter::GetIsCharacterTalking()
+{
+	return ThisController->bIsTalking;
+}

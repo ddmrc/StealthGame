@@ -81,6 +81,8 @@ void AEnemyAIController::BeginPlay()
 	BindingFunctions();
 	SettingUpBlackBoard();
 
+	bIsTalking = false;
+
 }
 
 void AEnemyAIController::Tick(float DeltaTime)
