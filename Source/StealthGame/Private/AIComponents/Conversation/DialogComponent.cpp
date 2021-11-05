@@ -69,12 +69,11 @@ USoundCue* UDialogComponent::GetRandSoundBasedOnTag(TArray<FDialogLine>Bank, FSt
 	}
 
 	int32 RandomSelection = FMath::RandRange(0, ValidSounds.Num() - 1);
-	if (ValidSounds.IsValidIndex(RandomSelection))
-	{
-		return ValidSounds[RandomSelection];
-	}
 
-	return NULL;
+		return ValidSounds[RandomSelection];
+
+
+	
 	
 }
 
