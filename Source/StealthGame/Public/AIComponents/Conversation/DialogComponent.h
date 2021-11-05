@@ -36,6 +36,7 @@ public:
 	bool PlayDialogLine(USoundCue* DialogLineAudio);
 	bool GetIsCurrentlyTalking() { return bIsCurrentlyTalking; }
 	USoundCue* GetRandSoundBasedOnTag(TArray<FDialogLine>Bank,FString Tag, int32 PlayerHeat);
+	bool bIsCurrentlyTalking = false;
 
 protected:
 	// Called when the game starts
@@ -47,7 +48,7 @@ protected:
 
 	UCustomAudioComponent* AudioComponent = nullptr;
 
-	bool bIsCurrentlyTalking = false;
+
 
 public:	
 	// Called every frame

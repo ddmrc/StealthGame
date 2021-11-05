@@ -44,6 +44,7 @@ void AAIManager::BeginPlay()
 	Super::BeginPlay();
 	
 	GForceAIState = 0;
+	LocalPlayerHeat = 0;
 
 }
 
@@ -330,6 +331,11 @@ void AAIManager::DialogMechanic()
 		{
 			DialogManager->RunThroughConversation(3);
 		}
+		if (DialogManager)
+		{
+			DialogManager->CheckIfConversationHasEnded();
+		}
+		
 
 		if (DialogManager && DialogManager->NotifyConversationHasEnded())
 		{
@@ -398,10 +404,9 @@ void AAIManager::UpdatePlayerHeat()
 			ControllerPatrolGuard2->PlayerDetectionTag == EPlayerDetectionStatus::Detected) &&
 			!bHasPlayerHeatBeenIncreased)
 		{
-			if (ControllerPatrolGuard1->PlayerHeat < 3 && ControllerPatrolGuard2->PlayerHeat < 3)
+			if (LocalPlayerHeat < 3)
 			{
-				ControllerPatrolGuard1->PlayerHeat++;
-				ControllerPatrolGuard2->PlayerHeat++;
+				LocalPlayerHeat++;
 				bHasPlayerHeatBeenIncreased = true;
 			}
 
@@ -413,5 +418,9 @@ void AAIManager::UpdatePlayerHeat()
 		{
 			bHasPlayerHeatBeenIncreased = false;
 		}
+
+		ControllerPatrolGuard1->PlayerHeat = LocalPlayerHeat;
+		ControllerPatrolGuard2->PlayerHeat = LocalPlayerHeat;
+
 	}
 }

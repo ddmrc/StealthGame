@@ -254,10 +254,6 @@ void ADialogManager::RunThroughConversation(int32 NumberOfLinesToSpeak)
 		}
 	}
 
-	if (!PatrolGuard1HasLinesLeft && !PatrolGuard2HasLinesLeft)
-	{
-		bHasConversationEnded = true;
-	}
 }
 
 bool ADialogManager::GetIfAConversationIsReadyToStart() 
@@ -278,4 +274,29 @@ bool ADialogManager::HasAnyAIHaveConversationLeft()
 
 	return false;
 }
+
+bool ADialogManager::CheckIfBothAIFinishedTalking()
+{
+	if (!DialogComponentPatrolGuard1->GetIsCurrentlyTalking() && !DialogComponentPatrolGuard2->GetIsCurrentlyTalking())
+	{
+
+		return true;
+	}
+
+	return false;
+}
+
+void ADialogManager::CheckIfConversationHasEnded()
+{
+
+	if (!PatrolGuard1HasLinesLeft && !PatrolGuard2HasLinesLeft && CheckIfBothAIFinishedTalking())
+	{
+		DialogComponentPatrolGuard1->bIsCurrentlyTalking = false;
+		DialogComponentPatrolGuard2->bIsCurrentlyTalking = false;
+		bHasConversationEnded = true;
+	}
+
+}
+
+
 

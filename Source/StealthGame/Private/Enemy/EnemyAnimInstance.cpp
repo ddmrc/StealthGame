@@ -176,6 +176,14 @@ bool UEnemyAnimInstance::IsAIHavingConversation()
 		{
 			return true;
 		}
+		else
+		{
+			if (Cast<AEnemyAIController>(ThisCharacter->GetController())->bIsTalking)
+			{
+				Cast<AEnemyAIController>(ThisCharacter->GetController())->bIsTalking = false;
+			}
+			
+		}
 	}
 	return false;
 }

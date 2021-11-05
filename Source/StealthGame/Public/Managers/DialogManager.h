@@ -29,6 +29,10 @@ public:
 	bool NotifyConversationHasEnded() { return bHasConversationEnded; }
 
 	void RunThroughConversation(int32 NumberOfLinesToSpeak);
+
+	bool CheckIfBothAIFinishedTalking();
+
+	void CheckIfConversationHasEnded();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

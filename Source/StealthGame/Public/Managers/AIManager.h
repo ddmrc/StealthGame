@@ -28,6 +28,8 @@ public:
 	AEnemyAIController* ControllerPatrolGuard3 = nullptr;
 
 	ADialogManager* DialogManager = nullptr;
+
+	int32 LocalPlayerHeat;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
