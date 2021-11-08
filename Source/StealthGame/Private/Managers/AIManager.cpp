@@ -13,7 +13,7 @@ static int32 GForceAIState = 0;
 static FAutoConsoleVariableRef CVarShowSoundEvents(
 	TEXT("Stealth.Debug.ForceAIState"),
 	GForceAIState,
-	TEXT("0 = Default Behaviour, 1 = Idle, 2 = Patrol, 3 = Chase, 4= LookAround,5= Search,6= Confused,7= Detected, 8= Conversation, Disable Sense 9= Sight,10= Hearing, 11= All"),
+	TEXT("0.Default, 1.Idle, 2.Patr, 3.Chase, 4.LookAr, 5.Search, 6.Confu, 7.Det, 8.Conv, Disable: 9. Sight 10.Hearing 11.All, Heat: 12.+ 13.-"),
 	ECVF_Cheat
 );
 
@@ -55,11 +55,12 @@ void AAIManager::Tick(float DeltaTime)
 
 	SetUpAIPointers();
 	//SetUpDialogManager();
+	DebugAIState();
 
 	DialogMechanic();
 
 
-	DebugAIState();
+
 
 	UpdatePlayerHeat();
 
@@ -113,6 +114,7 @@ void AAIManager::SetUpDialogManager()
 
 void AAIManager::DebugAIState()
 {
+
 	switch (GForceAIState)
 	{
 	case 0:
@@ -226,6 +228,8 @@ void AAIManager::DebugAIState()
 		bDebugNeedsReset = true;
 		break;
 	case 8:
+
+
 		if (ControllerPatrolGuard1 && ControllerPatrolGuard1->CurrentAIState != EAIStates::Conversation)
 		{
 			ControllerPatrolGuard1->SetWantsToStartConversation(true);
@@ -237,7 +241,9 @@ void AAIManager::DebugAIState()
 			ControllerPatrolGuard2->SetWantsToStartConversation(true);
 			ControllerPatrolGuard2->SetAIState(EAIStates::Conversation);
 			ControllerPatrolGuard2->FindComponentByClass<UAIPerceptionComponent>()->Deactivate();
+
 		}
+		GForceAIState = 99;
 		bDebugNeedsReset = true;
 		break;
 	case 9:
@@ -275,6 +281,24 @@ void AAIManager::DebugAIState()
 		}
 		bDebugNeedsReset = true;
 		break;
+	case 12:
+		if (LocalPlayerHeat < 3)
+		{
+			LocalPlayerHeat++;
+			GForceAIState = 99;
+		}
+		break;
+	case 13:
+		if (LocalPlayerHeat > 0)
+		{
+			LocalPlayerHeat--;
+			GForceAIState = 99;
+		}
+		break;
+
+	case 99:
+
+		break;
 	}
 }
 
@@ -304,8 +328,9 @@ bool AAIManager::CheckIfAnyAIWantsConversation()
 void AAIManager::DialogMechanic()
 {
 
-		if (CheckIfAnyAIWantsConversation())
+		if (CheckIfAnyAIWantsConversation() && MakeAIFaceEachOther())
 		{
+					
 			ControllerPatrolGuard1->SetAIState(EAIStates::Conversation);
 			ControllerPatrolGuard2->SetAIState(EAIStates::Conversation);
 
@@ -423,4 +448,35 @@ void AAIManager::UpdatePlayerHeat()
 		ControllerPatrolGuard2->PlayerHeat = LocalPlayerHeat;
 
 	}
+}
+
+bool AAIManager::MakeAIFaceEachOther()
+{
+	if (PatrolGuard1 && PatrolGuard2)
+	{
+		FVector Guard1Location = PatrolGuard1->GetActorLocation();
+		FVector Offset = PatrolGuard1->GetActorForwardVector()* 100.f;
+		FVector NewLocation = Guard1Location + Offset;
+
+		if (!PatrolGuard2->GetActorLocation().Equals(NewLocation), 50.f)
+		{
+			if (ControllerPatrolGuard2->GetSpawnTargetLocationHandler())
+			{
+				//ControllerPatrolGuard2->GetSpawnTargetLocationHandler()->SpawnRandomSearchPoints(NewLocation, 0.f, 1);
+				ControllerPatrolGuard2->MoveToLocation(NewLocation);
+				PatrolGuard2->SetActorRotation(PatrolGuard1->GetViewRotation() + 
+					FRotator(PatrolGuard1->GetActorForwardVector().X , GetActorForwardVector().Y + 180.f,
+						0.f));
+			}
+			
+			
+			//PatrolGuard2->SetActorLocation(NewLocation);
+		}
+		if (PatrolGuard2->GetActorLocation().Equals(NewLocation,100.f))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }

@@ -33,6 +33,8 @@ public:
 	bool CheckIfBothAIFinishedTalking();
 
 	void CheckIfConversationHasEnded();
+
+	bool bHasConversationEnded = false;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -56,7 +58,7 @@ protected:
 	bool PatrolGuard1HasLinesLeft = false;
 	bool PatrolGuard2HasLinesLeft = false;
 
-	bool bHasConversationEnded = false;
+
 
 public:	
 	// Called every frame

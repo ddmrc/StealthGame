@@ -52,6 +52,8 @@ protected:
 
 	void UpdatePlayerHeat();
 	bool bHasPlayerHeatBeenIncreased = false;
+
+	bool MakeAIFaceEachOther();
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

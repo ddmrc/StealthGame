@@ -60,6 +60,7 @@ public:
 
 	UPROPERTY()
 	bool bIsTalking;
+
 	UPROPERTY()
 	int32 PlayerHeat;
 
@@ -83,6 +84,9 @@ public:
 
 	bool GetWantsToStartConversation() { return bWantsToStartConversation; }
 	void SetWantsToStartConversation(bool bWantToStartConversation) {  bWantsToStartConversation = bWantToStartConversation; }
+
+	ASpawnAITargetLocationHandler* GetSpawnTargetLocationHandler(){return SpawnTargetLocationHandler;}
+
 
 protected:
 
