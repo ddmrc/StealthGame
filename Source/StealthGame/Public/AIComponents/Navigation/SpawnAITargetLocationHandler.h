@@ -31,6 +31,8 @@ public:
 
 	void ToggleAllPatrolMoveToPoints(bool bAreActive);
 
+	void SpawnConversationLocationPoint(FVector CentralPoint);
+
 
 protected:
 	TArray<AActor*> WroldPatrolMovingToList;

@@ -70,9 +70,6 @@ void UMyBTTask_Searching::SelectTarget(UBehaviorTreeComponent& OwnerComp)
 
 		MoveToLocationList.Empty();
 
-	
-
-
 	if (MoveToLocationList.Num() == 0)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("Selecting Search Location"));
@@ -109,7 +106,6 @@ void UMyBTTask_Searching::SelectTarget(UBehaviorTreeComponent& OwnerComp)
 
 	if (CurrentMoveToTarget)
 	{
-
 
 		if (OwnerComp.GetAIOwner()->GetCharacter()->GetActorLocation().Equals(CurrentMoveToTarget->GetActorLocation(), 50.f))
 		{

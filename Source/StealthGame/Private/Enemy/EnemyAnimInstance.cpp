@@ -174,7 +174,23 @@ bool UEnemyAnimInstance::IsAIHavingConversation()
 	{
 		if (GetCurrentAIState() == EAIStates::Conversation)
 		{
-			return true;
+			if (Cast<AEnemyAIController>(ThisCharacter->GetController())->ConversationIdentifier == "PatrolGuard1")
+			{
+				return true;
+			}
+			else
+			{
+				if (Cast<AEnemyAIController>(ThisCharacter->GetController())->bHasReachedConversationLocation)
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+
+			
 		}
 		else
 		{

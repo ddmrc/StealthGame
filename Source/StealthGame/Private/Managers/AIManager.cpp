@@ -81,6 +81,7 @@ void AAIManager::SetUpAIPointers()
 				{
 					PatrolGuard1 = Cast<AEnemyCharacter>(TempActorArr[i]);
 					ControllerPatrolGuard1 = Cast<AEnemyAIController>(PatrolGuard1->GetController());
+					ControllerPatrolGuard1->ConversationIdentifier = "PatrolGuard1";
 				}
 			}
 			else if (TempActorArr.IsValidIndex(i) && TempActorArr[i]->Tags[0] == "Guard2")
@@ -89,6 +90,7 @@ void AAIManager::SetUpAIPointers()
 				{
 					PatrolGuard2 = Cast<AEnemyCharacter>(TempActorArr[i]);
 					ControllerPatrolGuard2 = Cast<AEnemyAIController>(PatrolGuard2->GetController());
+					ControllerPatrolGuard2->ConversationIdentifier = "PatrolGuard2";
 				}
 			}
 		}
@@ -364,6 +366,18 @@ void AAIManager::DialogMechanic()
 
 		if (DialogManager && DialogManager->NotifyConversationHasEnded())
 		{
+
+			if (ControllerPatrolGuard1->bConversationPointNeedsDeleting)
+			{
+				ControllerPatrolGuard1->SpawnTargetLocationHandler->RemoveRandomSearchPoints();
+				ControllerPatrolGuard1->SpawnTargetLocationHandler->ToggleAllPatrolMoveToPoints(true);
+
+				ControllerPatrolGuard1->bConversationPointNeedsCreating = true;
+				ControllerPatrolGuard1->bConversationPointNeedsDeleting = false;
+			}
+			
+
+
 			if (ControllerPatrolGuard1->CurrentAIState == EAIStates::Conversation)
 			{
 				ControllerPatrolGuard1->SetAIState(EAIStates::Patrol);
@@ -454,28 +468,52 @@ bool AAIManager::MakeAIFaceEachOther()
 {
 	if (PatrolGuard1 && PatrolGuard2)
 	{
+
+		
 		FVector Guard1Location = PatrolGuard1->GetActorLocation();
-		FVector Offset = PatrolGuard1->GetActorForwardVector()* 100.f;
+		FVector Offset = PatrolGuard1->GetActorForwardVector() * 100.f;
 		FVector NewLocation = Guard1Location + Offset;
 
-		if (!PatrolGuard2->GetActorLocation().Equals(NewLocation), 50.f)
+		if (ControllerPatrolGuard1->bConversationPointNeedsCreating)
 		{
-			if (ControllerPatrolGuard2->GetSpawnTargetLocationHandler())
+			ControllerPatrolGuard1->SpawnTargetLocationHandler->ToggleAllPatrolMoveToPoints(false);
+
+
+			ControllerPatrolGuard1->SpawnTargetLocationHandler->SpawnRandomSearchPoints(NewLocation, 0.f, 1);
+
+			ControllerPatrolGuard1->bConversationPointNeedsCreating = false;
+			ControllerPatrolGuard1->bConversationPointNeedsDeleting = true;
+		}
+
+
+		//if (!PatrolGuard2->GetActorLocation().Equals(NewLocation), 50.f)
+		//{
+		//	if (ControllerPatrolGuard2->GetSpawnTargetLocationHandler())
+		//	{
+		//		//ControllerPatrolGuard2->GetSpawnTargetLocationHandler()->SpawnRandomSearchPoints(NewLocation, 0.f, 1);
+		//		ControllerPatrolGuard2->MoveToLocation(NewLocation);
+		//		PatrolGuard2->SetActorRotation(PatrolGuard1->GetViewRotation() + 
+		//			FRotator(PatrolGuard1->GetActorForwardVector().X , GetActorForwardVector().Y + 180.f,
+		//				0.f));
+		//	}
+		//	
+		//	
+		//	//PatrolGuard2->SetActorLocation(NewLocation);
+		//}
+	
+
+		if (ControllerPatrolGuard2->TargetMoveLocation)
+		{
+			if (ControllerPatrolGuard2->GetCharacter()->GetActorLocation().Equals(ControllerPatrolGuard2->TargetMoveLocation->GetActorLocation(), 50.f))
 			{
-				//ControllerPatrolGuard2->GetSpawnTargetLocationHandler()->SpawnRandomSearchPoints(NewLocation, 0.f, 1);
-				ControllerPatrolGuard2->MoveToLocation(NewLocation);
-				PatrolGuard2->SetActorRotation(PatrolGuard1->GetViewRotation() + 
-					FRotator(PatrolGuard1->GetActorForwardVector().X , GetActorForwardVector().Y + 180.f,
-						0.f));
+				ControllerPatrolGuard2->bHasReachedConversationLocation = true;
+				return true;
 			}
-			
-			
-			//PatrolGuard2->SetActorLocation(NewLocation);
 		}
-		if (PatrolGuard2->GetActorLocation().Equals(NewLocation,100.f))
-		{
-			return true;
-		}
+		//if (PatrolGuard2->GetActorLocation().Equals(NewLocation,100.f))
+		//{
+		//	return true;
+		//}
 	}
 
 	return false;

@@ -93,7 +93,7 @@ void AEnemyAIController::Tick(float DeltaTime)
 	
 	CheckAIStateToSetBehaviour();
 
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *FString::FromInt(PlayerHeat));
+	//UE_LOG(LogTemp, Warning, TEXT("%s"), *FString::FromInt(PlayerHeat));
 	
 }
 
@@ -526,6 +526,7 @@ void AEnemyAIController::ConversationBehaviour()
 	GetWorld()->GetTimerManager().PauseTimer(LookAroundTimer);
 	GetWorld()->GetTimerManager().PauseTimer(DetectAlliesTimer);
 
+	
 	//bWantsToStartConversation = false;
 }
 

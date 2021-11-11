@@ -117,7 +117,14 @@ void ASpawnAITargetLocationHandler::ToggleAllPatrolMoveToPoints(bool bAreActive)
 				WroldPatrolMovingToList[i]->SetActorEnableCollision(false);
 				WroldPatrolMovingToList[i]->Tags.Remove(FName("Activated"));
 				WroldPatrolMovingToList[i]->Tags.Add(FName("Deactivated"));
+
+				if (WroldPatrolMovingToList[i]->Tags.IsValidIndex(1))
+				{
+					WroldPatrolMovingToList[i]->Tags.RemoveAt(1);
+				}
 			}
+
+		
 		}
 	}
 	else
@@ -130,7 +137,14 @@ void ASpawnAITargetLocationHandler::ToggleAllPatrolMoveToPoints(bool bAreActive)
 				WroldPatrolMovingToList[i]->SetActorEnableCollision(true);
 				WroldPatrolMovingToList[i]->Tags.Remove(FName("Deactivated"));
 				WroldPatrolMovingToList[i]->Tags.Add(FName("Activated"));
+
+				if (WroldPatrolMovingToList[i]->Tags.IsValidIndex(1))
+				{
+					WroldPatrolMovingToList[i]->Tags.RemoveAt(1);
+				}
 			}
 		}
 	}
+
+
 }

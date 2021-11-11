@@ -88,22 +88,31 @@ public:
 	ASpawnAITargetLocationHandler* GetSpawnTargetLocationHandler(){return SpawnTargetLocationHandler;}
 
 
-protected:
+	FString ConversationIdentifier = "None";
 
-	/*VARIABLES*/
-	AActor* ActorTriggeredStimulus = nullptr;
-	AMyPlayerCharacter* PlayerCharacter = nullptr;
 	ASpawnAITargetLocationHandler* SpawnTargetLocationHandler = nullptr;
-	UDialogComponent* DialogComponent = nullptr;
-
 
 	UPROPERTY(EditAnywhere)
 	bool DebugLogText = false;
 	bool bSearchPointsDeleted = true;
 	bool bSearchPointNeedsUpdate = false;
+	bool bConversationPointNeedsCreating = true;
+	bool bConversationPointNeedsDeleting = false;
 	bool bWantToSetPatrolTimer = true;
 	bool bIgnoreSenseFromAllies = false;
 	bool bWantsToStartConversation = false;
+	bool bHasReachedConversationLocation = false;
+
+protected:
+
+	/*VARIABLES*/
+	AActor* ActorTriggeredStimulus = nullptr;
+	AMyPlayerCharacter* PlayerCharacter = nullptr;
+
+	UDialogComponent* DialogComponent = nullptr;
+
+
+
 	FTimerHandle DetectedTimer;
 	FTimerHandle SearchTimer;
 	FTimerHandle PatrolTimer;
@@ -115,7 +124,6 @@ protected:
 	FTimerDelegate TimerDetectedToLookAround;
 	FTimerDelegate TimerSearchToConfused;
 	FTimerDelegate TimerDetectAllies;
-
 
 
 	/*FUNCTIONS*/
