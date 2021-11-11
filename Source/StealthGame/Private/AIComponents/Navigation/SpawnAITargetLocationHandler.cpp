@@ -45,13 +45,14 @@ void ASpawnAITargetLocationHandler::SpawnRandomSearchPoints(FVector CentralPoint
 
 		AActor* NewActor = GetWorld()->SpawnActor(MyItemBlueprint, &SpawnCentralPoint, &Rotation);
 
-
-
+		
+		WroldSearchMovingToList.Add(NewActor);
 
 		if (SurrondingNumberOfSpawnLocations > 0)
 		{
 			for (int i = 1; i < SurrondingNumberOfSpawnLocations+1; i++)
 			{
+
 				float LocationX = 0.f;
 				float LocationY = 0.f;
 
@@ -65,7 +66,7 @@ void ASpawnAITargetLocationHandler::SpawnRandomSearchPoints(FVector CentralPoint
 				const FVector SpawnLocation = FVector(SpawnCentralPoint.X + LocationX, SpawnCentralPoint.Y + LocationY, SpawnCentralPoint.Z);
 
 				NewActor = GetWorld()->SpawnActor(MyItemBlueprint, &SpawnLocation, &Rotation);
-
+				WroldSearchMovingToList.Add(NewActor);
 			}
 		}
 	}
@@ -82,7 +83,8 @@ void ASpawnAITargetLocationHandler::SpawnRandomSearchPoints(FVector CentralPoint
 
 void ASpawnAITargetLocationHandler::RemoveRandomSearchPoints()
 {
-	if (WroldSearchMovingToList.IsValidIndex(0))
+
+	if (WroldSearchMovingToList.Num() > 0)
 	{
 		for (int i = 0; i < WroldSearchMovingToList.Num(); i++)
 		{

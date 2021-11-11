@@ -81,6 +81,8 @@ void AEnemyAIController::BeginPlay()
 	BindingFunctions();
 	SettingUpBlackBoard();
 
+	
+
 	bIsTalking = false;
 	PlayerHeat = 0;
 }
@@ -345,7 +347,7 @@ void AEnemyAIController::PatrolBehaviour()
 			if (ActorTriggeredStimulus && ActorTriggeredStimulus->GetActorLocation().Equals(GetCharacter()->GetActorLocation(), 10000.f))
 			{
 
-				bWantsToStartConversation = true;
+				
 			}
 		}
 	}

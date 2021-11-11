@@ -96,7 +96,7 @@ public:
 	bool DebugLogText = false;
 	bool bSearchPointsDeleted = true;
 	bool bSearchPointNeedsUpdate = false;
-	bool bConversationPointNeedsCreating = true;
+	bool bConversationPointNeedsCreating = false;
 	bool bConversationPointNeedsDeleting = false;
 	bool bWantToSetPatrolTimer = true;
 	bool bIgnoreSenseFromAllies = false;

@@ -186,6 +186,7 @@ bool UEnemyAnimInstance::IsAIHavingConversation()
 				}
 				else
 				{
+					
 					return false;
 				}
 			}

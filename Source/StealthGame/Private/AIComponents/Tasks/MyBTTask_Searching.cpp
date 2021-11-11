@@ -41,6 +41,7 @@ EBTNodeResult::Type UMyBTTask_Searching::ExecuteTask(UBehaviorTreeComponent& Own
 
 
 		NodeResult = PerformMoveTask(OwnerComp, NodeMemory);
+
 	}
 
 
@@ -121,6 +122,7 @@ void UMyBTTask_Searching::SelectTarget(UBehaviorTreeComponent& OwnerComp)
 			}
 
 			bIsMoveToLocationReached = true;
+			
 		}
 	}
 }

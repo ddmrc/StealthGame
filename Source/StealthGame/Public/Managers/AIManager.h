@@ -44,6 +44,8 @@ protected:
 	void DebugAIState();
 	bool bDebugNeedsReset = false;
 
+	bool bConversationHasBeenSet = false;
+
 	TSubclassOf<ADialogManager> MyItemBlueprint;
 	TSubclassOf<AEnemyCharacter> MyItemBlueprint2;
 

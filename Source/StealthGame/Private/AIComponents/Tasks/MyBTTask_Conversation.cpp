@@ -26,7 +26,7 @@ EBTNodeResult::Type UMyBTTask_Conversation::ExecuteTask(UBehaviorTreeComponent& 
 	AEnemyAIController* AIController = Cast<AEnemyAIController>(OwnerComp.GetAIOwner()->GetCharacter()->GetController());
 	if (AIController->ConversationIdentifier != "PatrolGuard1")
 	{
-		if (!AIController->bHasReachedConversationLocation && !bMoveToScanned)
+		if (!AIController->bHasReachedConversationLocation)
 		{
 			SelectTarget(OwnerComp);
 		}
@@ -76,9 +76,11 @@ void UMyBTTask_Conversation::SelectTarget(UBehaviorTreeComponent& OwnerComp)
 
 	AEnemyAIController* AIController = Cast<AEnemyAIController>(OwnerComp.GetAIOwner()->GetCharacter()->GetController());
 
+	bMoveToScanned = AIController->bSearchPointNeedsUpdate;
+
 	if (!AIController->bHasReachedConversationLocation && !bMoveToScanned)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MoveTo Located"));
+	
 		TArray <AActor*> TempArr;
 
 		UGameplayStatics::GetAllActorsOfClassWithTag(this, AMoveToLocationActor::StaticClass(), FName("Activated"), TempArr);

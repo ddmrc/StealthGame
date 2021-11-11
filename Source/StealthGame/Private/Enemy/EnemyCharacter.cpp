@@ -23,6 +23,8 @@ void AEnemyCharacter::BeginPlay()
 	
 	CurrentMovementState = EMovementState::Idle;
 	//SetGenericTeamId(2);
+
+	
 }
 
 // Called every frame
@@ -63,9 +65,23 @@ void AEnemyCharacter::UpdateMovementState()
 	//}
 	if (ThisController)
 	{
+		
 		if (ThisController->CurrentAIState == EAIStates::Idle && CurrentMovementState != EMovementState::Idle)
 		{
-			CurrentMovementState = EMovementState::Idle;
+			
+
+			if (GetVelocity() == FVector::ZeroVector)
+			{
+				CurrentMovementState = EMovementState::Idle;
+			}
+			else
+			{
+				
+				CurrentMovementState = EMovementState::Walking;
+			}
+			
+
+			
 		}
 		else if (ThisController->CurrentAIState == EAIStates::Patrol && CurrentMovementState != EMovementState::Walking)
 		{
@@ -115,6 +131,17 @@ void AEnemyCharacter::UpdateMovementState()
 		else if (ThisController->CurrentAIState == EAIStates::LookingAround)
 		{
 			CurrentMovementState = EMovementState::StaticSearch;
+		}
+		else if (ThisController->ConversationIdentifier != "PatrolGuard1" && ThisController->CurrentAIState == EAIStates::Conversation)
+		{
+			
+
+			if (!ThisController->bHasReachedConversationLocation)
+			{
+				
+				CurrentMovementState = EMovementState::Walking;
+			}
+
 		}
 
 	}
