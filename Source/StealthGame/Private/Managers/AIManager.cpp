@@ -70,33 +70,62 @@ void AAIManager::Tick(float DeltaTime)
 
 void AAIManager::SetUpAIPointers()
 {
-	TArray <AActor*> TempActorArr;
-	UGameplayStatics::GetAllActorsOfClass(this, AEnemyCharacter::StaticClass(), TempActorArr);
-	if (TempActorArr.Num() > 0)
+	if (PatrolGuard1 == nullptr || PatrolGuard2 == nullptr)
 	{
-		for (int i = 0; i < TempActorArr.Num(); i++)
+
+		TArray <AActor*> TempActorArr;
+		UGameplayStatics::GetAllActorsOfClass(this, AEnemyCharacter::StaticClass(), TempActorArr);
+		if (TempActorArr.Num() > 0)
 		{
-			if (TempActorArr.IsValidIndex(i) && TempActorArr[i]->GetOwner()->GetName().EndsWith("0"))
+			for (int i = 0; i < TempActorArr.Num(); i++)
 			{
-				if (PatrolGuard1 == nullptr)
+				if (TempActorArr.IsValidIndex(i))
 				{
-					PatrolGuard1 = Cast<AEnemyCharacter>(TempActorArr[i]);
-					ControllerPatrolGuard1 = Cast<AEnemyAIController>(PatrolGuard1->GetController());
-					ControllerPatrolGuard1->ConversationIdentifier = "PatrolGuard1";
-					PatrolGuard1->Tags.Add("Guard1");
-					
 
-				}
+					if (TempActorArr[i]->Tags.Num() > 0 && TempActorArr[i]->Tags[0].ToString() == "Guard1")
+					{
+						
+						if (PatrolGuard1 == nullptr)
+						{
+							UE_LOG(LogTemp, Warning, TEXT("%s"), *TempActorArr[i]->GetOwner()->GetName());
+							PatrolGuard1 = Cast<AEnemyCharacter>(TempActorArr[i]);
+							ControllerPatrolGuard1 = Cast<AEnemyAIController>(PatrolGuard1->GetController());
+							ControllerPatrolGuard1->ConversationIdentifier = "PatrolGuard1";
+						}
 
-			}
-			else if (TempActorArr.IsValidIndex(i) && TempActorArr[i]->GetOwner()->GetName().EndsWith("1"))
-			{
-				if (PatrolGuard2 == nullptr)
-				{
-					PatrolGuard2 = Cast<AEnemyCharacter>(TempActorArr[i]);
-					ControllerPatrolGuard2 = Cast<AEnemyAIController>(PatrolGuard2->GetController());
-					ControllerPatrolGuard2->ConversationIdentifier = "PatrolGuard2";
-					PatrolGuard2->Tags.Add("Guard2");
+					}
+					else if (TempActorArr[i]->Tags.Num() == 0 && TempActorArr[i]->GetOwner()->GetName().EndsWith("0"))
+					{
+						if (PatrolGuard1 == nullptr)
+						{
+							PatrolGuard1 = Cast<AEnemyCharacter>(TempActorArr[i]);
+							ControllerPatrolGuard1 = Cast<AEnemyAIController>(PatrolGuard1->GetController());
+							ControllerPatrolGuard1->ConversationIdentifier = "PatrolGuard1";
+							PatrolGuard1->Tags.Add("Guard1");
+						}
+					}
+
+					if (TempActorArr[i]->Tags.Num() > 0 && TempActorArr[i]->Tags[0].ToString() == "Guard2")
+					{
+						if (PatrolGuard2 == nullptr)
+						{
+							
+							PatrolGuard2 = Cast<AEnemyCharacter>(TempActorArr[i]);
+							ControllerPatrolGuard2 = Cast<AEnemyAIController>(PatrolGuard2->GetController());
+							ControllerPatrolGuard2->ConversationIdentifier = "PatrolGuard2";
+						}
+					}
+					else if (TempActorArr[i]->Tags.Num() == 0 && TempActorArr[i]->GetOwner()->GetName().EndsWith("1"))
+					{
+						if (PatrolGuard2 == nullptr)
+						{
+							PatrolGuard2 = Cast<AEnemyCharacter>(TempActorArr[i]);
+							ControllerPatrolGuard2 = Cast<AEnemyAIController>(PatrolGuard2->GetController());
+							ControllerPatrolGuard2->ConversationIdentifier = "PatrolGuard2";
+							PatrolGuard2->Tags.Add("Guard2");
+						}
+
+					}
 				}
 			}
 		}
