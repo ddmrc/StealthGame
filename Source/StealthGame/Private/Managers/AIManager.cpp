@@ -526,13 +526,13 @@ bool AAIManager::MakeAIFaceEachOther()
 		//}
 	
 
-		if (ControllerPatrolGuard2->TargetMoveLocation && ControllerPatrolGuard2->TargetMoveLocation)
+		if (ControllerPatrolGuard2->TargetMoveLocation)
 		{
 
 			
 			if (ControllerPatrolGuard2->TargetMoveLocation && 
-				ControllerPatrolGuard2->GetCharacter() &&
-				ControllerPatrolGuard2->GetCharacter()->GetActorLocation().Equals(ControllerPatrolGuard2->TargetMoveLocation->GetActorLocation(), 50.f))
+				PatrolGuard2 &&
+				PatrolGuard2->GetActorLocation().Equals(ControllerPatrolGuard2->TargetMoveLocation->GetActorLocation(), 50.f))
 			{
 
 
