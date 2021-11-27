@@ -2,6 +2,8 @@
 
 
 #include "AIComponents/Conversation/DialogComponent.h"
+#include "Enemy/EnemyAIController.h"
+#include "GameFramework/Character.h"
 
 // Sets default values for this component's properties
 UDialogComponent::UDialogComponent()
@@ -63,6 +65,7 @@ bool UDialogComponent::PlayDialogLine(USoundCue* DialogLineAudio)
 			AudioComponent->Sound = DialogLineAudio;
 			AudioComponent->Play(0.f, ReportSoundRange, bReportSoundEnable, bDebugDraw);
 			bIsCurrentlyTalking = true;
+			Cast<AEnemyAIController>(GetOwner()->GetInstigatorController())->bIsTalking = bIsCurrentlyTalking;
 			return true;
 		}
 	}
@@ -73,4 +76,5 @@ bool UDialogComponent::PlayDialogLine(USoundCue* DialogLineAudio)
 void UDialogComponent::NotifyLineIsFinishedPlaying()
 {
 	bIsCurrentlyTalking = false;
+	Cast<AEnemyAIController>(GetOwner()->GetInstigatorController())->bIsTalking = bIsCurrentlyTalking;
 }

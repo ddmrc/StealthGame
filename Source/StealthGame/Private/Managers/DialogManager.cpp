@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 
 
+
 // Sets default values
 ADialogManager::ADialogManager()
 {
@@ -118,9 +119,6 @@ void ADialogManager::RunThroughConversation()
 
 		PatrolGuardIDToTalk = 2;
 
-		ControllerPatrolGuard2->bIsTalking = false;
-		ControllerPatrolGuard1->bIsTalking = true;
-
 	}
 
 	else if (ConversationPatrolGuard2.Num() > 0 && PatrolGuardIDToTalk == 2 && !DialogComponentPatrolGuard1->GetIsCurrentlyTalking())
@@ -135,9 +133,6 @@ void ADialogManager::RunThroughConversation()
 		}
 
 		PatrolGuardIDToTalk = 1;
-
-		ControllerPatrolGuard1->bIsTalking = false;
-		ControllerPatrolGuard2->bIsTalking = true;
 
 	}
 	
