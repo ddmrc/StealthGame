@@ -55,7 +55,7 @@ void AAIManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	SetUpAIPointers();
-	//SetUpDialogManager();
+
 	DebugAIState();
 
 	DialogMechanic();
@@ -130,6 +130,87 @@ void AAIManager::SetUpAIPointers()
 			}
 		}
 	}
+}
+
+void AAIManager::DialogMechanic()
+{
+	CheckIfAnyAIWantsConversation();
+
+	if (MakeAIFaceEachOther())
+	{
+
+		ControllerPatrolGuard1->SetAIState(EAIStates::Conversation);
+		ControllerPatrolGuard2->SetAIState(EAIStates::Conversation);
+
+		if (DialogManager == nullptr)
+		{
+			SpawnDialogManager();
+
+		}
+
+		if (DialogManager)
+		{
+			DialogManager->SetUpConversationForController(1, NumberOfLinesForConversation, "Default");
+			DialogManager->SetUpConversationForController(2, NumberOfLinesForConversation, "Default");
+		}
+
+		ControllerPatrolGuard1->SetWantsToStartConversation(false);
+		ControllerPatrolGuard2->SetWantsToStartConversation(false);
+
+	}
+
+	if (DialogManager)
+	{
+		if (DialogManager->HasAnyAIHaveConversationLeft())
+		{
+			DialogManager->RunThroughConversation(NumberOfLinesForConversation);
+		}
+
+		DialogManager->CheckIfConversationHasEnded();
+
+
+		if (DialogManager->NotifyConversationHasEnded())
+		{
+
+			if (ControllerPatrolGuard1->bConversationPointNeedsDeleting)
+			{
+				ControllerPatrolGuard1->SpawnTargetLocationHandler->RemoveRandomSearchPoints();
+				ControllerPatrolGuard1->SpawnTargetLocationHandler->ToggleAllPatrolMoveToPoints(true);
+
+
+				ControllerPatrolGuard1->bConversationPointNeedsDeleting = false;
+			}
+
+			if (ControllerPatrolGuard2->bHasReachedConversationLocation)
+			{
+				ControllerPatrolGuard2->bHasReachedConversationLocation = false;
+
+			}
+
+
+			if (ControllerPatrolGuard1->CurrentAIState == EAIStates::Conversation)
+			{
+				ControllerPatrolGuard1->SetAIState(EAIStates::Patrol);
+
+			}
+
+			if (ControllerPatrolGuard2->CurrentAIState == EAIStates::Conversation)
+			{
+				ControllerPatrolGuard2->SetAIState(EAIStates::Patrol);
+			}
+
+			DialogManager->Destroy();
+
+			if (DialogManager != nullptr)
+			{
+				DialogManager = nullptr;
+			}
+
+			ControllerPatrolGuard2->TargetMoveLocation = nullptr;
+		}
+
+	}
+
 }
 
 void AAIManager::SetUpDialogManager()
@@ -366,87 +447,6 @@ bool AAIManager::CheckIfAnyAIWantsConversation()
 	}
 
 	return false;
-}
-
-void AAIManager::DialogMechanic()
-{
-	CheckIfAnyAIWantsConversation();
-
-		if ( MakeAIFaceEachOther())
-		{
-			
-				ControllerPatrolGuard1->SetAIState(EAIStates::Conversation);
-				ControllerPatrolGuard2->SetAIState(EAIStates::Conversation);
-
-				if (DialogManager == nullptr)
-				{
-					SpawnDialogManager();
-					
-				}
-
-				if (DialogManager)
-				{
-					DialogManager->SetUpConversationForController(1, "Default");
-					DialogManager->SetUpConversationForController(2, "Default");
-				}
-
-
-
-
-				ControllerPatrolGuard1->SetWantsToStartConversation(false);
-				ControllerPatrolGuard2->SetWantsToStartConversation(false);
-
-		}
-
-		if (DialogManager && DialogManager->HasAnyAIHaveConversationLeft())
-		{
-			DialogManager->RunThroughConversation(3);
-		}
-		if (DialogManager)
-		{
-			DialogManager->CheckIfConversationHasEnded();
-		}
-		
-
-		if (DialogManager && DialogManager->NotifyConversationHasEnded())
-		{
-
-			if (ControllerPatrolGuard1->bConversationPointNeedsDeleting)
-			{
-				ControllerPatrolGuard1->SpawnTargetLocationHandler->RemoveRandomSearchPoints();
-				ControllerPatrolGuard1->SpawnTargetLocationHandler->ToggleAllPatrolMoveToPoints(true);
-
-				
-				ControllerPatrolGuard1->bConversationPointNeedsDeleting = false;
-			}
-			
-			if (ControllerPatrolGuard2->bHasReachedConversationLocation)
-			{
-				ControllerPatrolGuard2->bHasReachedConversationLocation = false;
-
-			}
-
-
-			if (ControllerPatrolGuard1->CurrentAIState == EAIStates::Conversation)
-			{
-				ControllerPatrolGuard1->SetAIState(EAIStates::Patrol);
-
-			}
-
-			if (ControllerPatrolGuard2->CurrentAIState == EAIStates::Conversation)
-			{
-				ControllerPatrolGuard2->SetAIState(EAIStates::Patrol);
-			}
-
-			DialogManager->Destroy();
-			if (DialogManager != nullptr)
-			{
-				DialogManager = nullptr;
-			}
-
-			ControllerPatrolGuard2->TargetMoveLocation = nullptr;
-		}
-	
 }
 
 void AAIManager::SpawnDialogManager()

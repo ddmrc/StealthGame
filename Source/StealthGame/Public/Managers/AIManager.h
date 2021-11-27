@@ -30,11 +30,22 @@ public:
 	ADialogManager* DialogManager = nullptr;
 
 	int32 LocalPlayerHeat;
+	int32 NumberOfLinesForConversation = 3;
 protected:
+
+	bool bDebugNeedsReset = false;
+
+	bool bConversationHasBeenSet = false;
+
+	TSubclassOf<ADialogManager> MyItemBlueprint;
+
+	TSubclassOf<AEnemyCharacter> MyItemBlueprint2;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
 	void SetUpAIPointers();
+
 	void SetUpDialogManager();
 
 	bool CheckIfAnyAIWantsConversation();
@@ -42,17 +53,13 @@ protected:
 	void DialogMechanic();
 
 	void DebugAIState();
-	bool bDebugNeedsReset = false;
-
-	bool bConversationHasBeenSet = false;
-
-	TSubclassOf<ADialogManager> MyItemBlueprint;
-	TSubclassOf<AEnemyCharacter> MyItemBlueprint2;
 
 	void SpawnDialogManager();
+
 	void SpawnPatrolGuard(FVector Location,FRotator Rotation);
 
 	void UpdatePlayerHeat();
+
 	bool bHasPlayerHeatBeenIncreased = false;
 
 	bool MakeAIFaceEachOther();

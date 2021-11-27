@@ -30,6 +30,7 @@ void CustomSoundWrapper::PlaySoundAtLocation(UWorld* World, USoundBase* SoundCue
 {
 	UGameplayStatics::PlaySoundAtLocation(World, SoundCue, NoiseLocation, Loudness);
 	UAISense_Hearing::ReportNoiseEvent(World, NoiseLocation, Loudness, Instigator, MaxRange);
+
 	if (GShowSoundEvents == 0)
 	{
 		return;

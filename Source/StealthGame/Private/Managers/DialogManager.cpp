@@ -27,13 +27,7 @@ void ADialogManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-
-
 		GDialogOption = 0;
-
-
-
-
 	
 }
 
@@ -43,24 +37,6 @@ void ADialogManager::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	DebugDialog();
-
-
-
-
-
-	//if (GDialogOption == 4)
-	//{
-	//	FString Topic = "Default";
-	//	SetUpConversationForController(1, Topic);
-	//	SetUpConversationForController(2, Topic);
-	//	GDialogOption = 0;
-
-	//}
-	//else if (GDialogOption == 5)
-	//{
-	//	int32 NumberOfLinesToSay = 3;
-	//	RunThroughConversation(NumberOfLinesToSay);
-	//}
 }
 
 void ADialogManager::DebugDialog()
@@ -96,7 +72,7 @@ void ADialogManager::DebugDialog()
 			if (DialogComponent)
 			{
 				DialogComponent->PlayDialogLine(Line3);
-				UE_LOG(LogTemp, Warning, TEXT("PLAYING Dialog"));
+
 				GDialogOption = 0;
 			}
 			break;
@@ -136,56 +112,63 @@ bool ADialogManager::CheckAIControllerReferenceByIndex(int32 PatrolGuardID)
 	return false;
 }
 
-void ADialogManager::SetUpConversationForController(int32 PatrolGuardID, FString Topic)
+void ADialogManager::SetUpConversationForController(int32 PatrolGuardID, int32 NumberOfLines, FString Topic)
 {
 	bHasConversationEnded = false;
 
-	USoundCue* Line1;
-	USoundCue* Line2;
-	USoundCue* Line3;
-	switch (PatrolGuardID)
+	if (NumberOfLines == 3 && Topic == "Default")
 	{
-	case 1:
-		if (DialogComponentPatrolGuard1 && Topic == "Default")
+		USoundCue* Line1;
+		USoundCue* Line2;
+		USoundCue* Line3;
+
+		switch (PatrolGuardID)
 		{
-			Line1 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Greeting", ControllerPatrolGuard1->PlayerHeat);
-			Line2 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Inquire", ControllerPatrolGuard1->PlayerHeat);
-			Line3 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Goodbye", ControllerPatrolGuard1->PlayerHeat);
+		case 1:
+			if (DialogComponentPatrolGuard1)
+			{
+				Line1 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Greeting", ControllerPatrolGuard1->PlayerHeat);
+				Line2 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Inquire", ControllerPatrolGuard1->PlayerHeat);
+				Line3 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Goodbye", ControllerPatrolGuard1->PlayerHeat);
+			}
+
+			ConversationPatrolGuard1.Empty();
+
+			ConversationPatrolGuard1.Add(Line1);
+			ConversationPatrolGuard1.Add(Line2);
+			ConversationPatrolGuard1.Add(Line3);
+
+			PatrolGuard1HasLinesLeft = true;
+			break;
+
+		case 2:
+			if (DialogComponentPatrolGuard2)
+			{
+				Line1 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag(DialogComponentPatrolGuard2->DefaultBank, "Greeting", ControllerPatrolGuard2->PlayerHeat);
+				Line2 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag(DialogComponentPatrolGuard2->DefaultBank, "Inquire", ControllerPatrolGuard2->PlayerHeat);
+				Line3 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag(DialogComponentPatrolGuard2->DefaultBank, "Goodbye", ControllerPatrolGuard2->PlayerHeat);
+			}
+
+			ConversationPatrolGuard2.Empty();
+
+			ConversationPatrolGuard2.Add(Line1);
+			ConversationPatrolGuard2.Add(Line2);
+			ConversationPatrolGuard2.Add(Line3);
+
+			PatrolGuard2HasLinesLeft = true;
+			break;
 		}
-
-
-
-		
-		ConversationPatrolGuard1.Empty();
-
-		ConversationPatrolGuard1.Add(Line1);
-		ConversationPatrolGuard1.Add(Line2);
-		ConversationPatrolGuard1.Add(Line3);
-
-		PatrolGuard1HasLinesLeft = true;
-		break;
-
-	case 2:
-		if (DialogComponentPatrolGuard2)
-		{
-			Line1 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag(DialogComponentPatrolGuard2->DefaultBank, "Greeting", ControllerPatrolGuard2->PlayerHeat);
-			Line2 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag(DialogComponentPatrolGuard2->DefaultBank, "Inquire", ControllerPatrolGuard2->PlayerHeat);
-			Line3 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag(DialogComponentPatrolGuard2->DefaultBank, "Goodbye", ControllerPatrolGuard2->PlayerHeat);
-		}
-
-
-
-
-		ConversationPatrolGuard2.Empty();
-
-		ConversationPatrolGuard2.Add(Line1);
-		ConversationPatrolGuard2.Add(Line2);
-		ConversationPatrolGuard2.Add(Line3);
-
-		PatrolGuard2HasLinesLeft = true;
-		break;
 	}
 
+}
+
+bool ADialogManager::GetIfAConversationIsReadyToStart()
+{
+	if (PatrolGuard1ConversationReady && PatrolGuard2ConversationReady)
+	{
+		return true;
+	}
+	return false;
 }
 
 void ADialogManager::RunThroughConversation(int32 NumberOfLinesToSpeak)
@@ -254,15 +237,6 @@ void ADialogManager::RunThroughConversation(int32 NumberOfLinesToSpeak)
 		}
 	}
 
-}
-
-bool ADialogManager::GetIfAConversationIsReadyToStart() 
-{
-	if (PatrolGuard1ConversationReady && PatrolGuard2ConversationReady)
-	{
-		return true;
-	}
-	return false;
 }
 
 bool ADialogManager::HasAnyAIHaveConversationLeft()

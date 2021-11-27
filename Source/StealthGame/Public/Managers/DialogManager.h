@@ -16,11 +16,12 @@ class STEALTHGAME_API ADialogManager : public AActor
 public:	
 	// Sets default values for this actor's properties
 	ADialogManager();
+
 	void SetUpAIPointerReference(AEnemyAIController* Controller, int32 PatrolGuardID);
 
 	bool CheckAIControllerReferenceByIndex(int32 PatrolGuardID);
 
-	void SetUpConversationForController(int32 PatrolGuardID, FString Topic);
+	void SetUpConversationForController(int32 PatrolGuardID, int32 NumberOfLines, FString Topic);
 
 	bool GetIfAConversationIsReadyToStart();
 

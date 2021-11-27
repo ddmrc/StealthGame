@@ -13,7 +13,6 @@ UDialogComponent::UDialogComponent()
 	// ...
 }
 
-
 // Called when the game starts
 void UDialogComponent::BeginPlay()
 {
@@ -32,13 +31,35 @@ void UDialogComponent::BeginPlay()
 	
 }
 
-
 // Called every frame
 void UDialogComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+USoundCue* UDialogComponent::GetRandSoundBasedOnTag(TArray<FDialogLine>Bank, FString Tag, int32 PlayerHeat)
+{
+	TArray<USoundCue*> ValidSounds;
+
+	for (int i = 0; i < Bank.Num();i++)
+	{
+		if (Bank.IsValidIndex(i) && Bank[i].LineTag == Tag && Bank[i].PlayerHeat == PlayerHeat)
+		{
+			ValidSounds.Add(Bank[i].AudioCue);
+		}
+	}
+
+	int32 RandomSelection = FMath::RandRange(0, ValidSounds.Num() - 1);
+
+	if (ValidSounds.IsValidIndex(RandomSelection))
+	{
+		return ValidSounds[RandomSelection];
+	}
+
+	return NULL;
+
 }
 
 bool UDialogComponent::PlayDialogLine(USoundCue* DialogLineAudio)
@@ -55,27 +76,6 @@ bool UDialogComponent::PlayDialogLine(USoundCue* DialogLineAudio)
 	}
 
 	return false;
-}
-
-USoundCue* UDialogComponent::GetRandSoundBasedOnTag(TArray<FDialogLine>Bank, FString Tag,int32 PlayerHeat)
-{
-	TArray<USoundCue*> ValidSounds;
-	for (int i = 0; i < Bank.Num();i++)
-	{
-		if (Bank.IsValidIndex(i) && Bank[i].LineTag == Tag && Bank[i].PlayerHeat == PlayerHeat)
-		{
-			ValidSounds.Add(Bank[i].AudioCue);
-		}
-	}
-
-	int32 RandomSelection = FMath::RandRange(0, ValidSounds.Num() - 1);
-	if (ValidSounds.IsValidIndex(RandomSelection))
-	{
-		return ValidSounds[RandomSelection];
-	}
-
-	return NULL;
-	
 }
 
 void UDialogComponent::NotifyLineIsFinishedPlaying()

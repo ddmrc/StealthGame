@@ -162,28 +162,28 @@ void AEnemyAIController::SetAIState(EAIStates NewState)
 		switch (NewState)
 		{
 		case EAIStates::Idle:
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, TEXT("AI Idle"));
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, TEXT("AI Idle"),true);
 			break;
 		case EAIStates::Detected:
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Player Detected"));
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, TEXT("Player Detected"),true);
 			break;
 		case EAIStates::Patrol:
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Patrolling"));
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Yellow, TEXT("Patrolling"),true);
 			break;
 		case EAIStates::Chasing:
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Blue, TEXT("Player Being Chasing"));
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Blue, TEXT("Player Being Chasing"),true);
 			break;
 		case EAIStates::Confused:
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Orange, TEXT("AI Confused"));
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Orange, TEXT("AI Confused"),true);
 			break;
 		case EAIStates::Searching:
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Purple, TEXT("AI Searching"));
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Purple, TEXT("AI Searching"),true);
 			break;
 		case EAIStates::LookingAround:
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::White, TEXT("AI Looking Around"));
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::White, TEXT("AI Looking Around"),true);
 			break;
 		case EAIStates::Conversation:
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Orange, TEXT("Conversation"));
+			GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Orange, TEXT("Conversation"),true);
 			break;
 
 
