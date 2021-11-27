@@ -30,29 +30,31 @@ class STEALTHGAME_API UDialogComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UDialogComponent();
-	UPROPERTY(EditAnywhere)
+
+	UCustomAudioComponent* AudioComponent = nullptr;
+	bool bIsCurrentlyTalking = false;
+
+	UPROPERTY(EditAnywhere, Category = "Sound Cues")
 	TArray<FDialogLine> DefaultBank;
+
+	UPROPERTY(EditAnywhere, Category = "AI Report")
+	bool bReportSoundEnable = true;
+	UPROPERTY(EditAnywhere, Category = "AI Report")
+	float ReportSoundRange = 500.f;
+
+	UPROPERTY(EditAnywhere, Category = "Debug")
+	bool bDebugDraw = true;
 
 	bool PlayDialogLine(USoundCue* DialogLineAudio);
 	bool GetIsCurrentlyTalking() { return bIsCurrentlyTalking; }
-	USoundCue* GetRandSoundBasedOnTag(TArray<FDialogLine>Bank,FString Tag, int32 PlayerHeat);
-	bool bIsCurrentlyTalking = false;
+
+	USoundCue* GetRandSoundBasedOnTag(TArray<FDialogLine>Bank, FString Tag, int32 PlayerHeat);
 
 protected:
+
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	void NotifyLineIsFinishedPlaying();
-
-
-	UCustomAudioComponent* AudioComponent = nullptr;
-
-
-
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
+	void NotifyLineIsFinishedPlaying();		
 };

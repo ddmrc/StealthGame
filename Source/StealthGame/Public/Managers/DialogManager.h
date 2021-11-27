@@ -19,26 +19,15 @@ public:
 
 	void SetUpAIPointerReference(AEnemyAIController* Controller, int32 PatrolGuardID);
 
-	bool CheckAIControllerReferenceByIndex(int32 PatrolGuardID);
-
 	void SetUpConversationForController(int32 PatrolGuardID, int32 NumberOfLines, FString Topic);
-
-	bool GetIfAConversationIsReadyToStart();
 
 	bool HasAnyAIHaveConversationLeft();
 
-	bool NotifyConversationHasEnded() { return bHasConversationEnded; }
+	void RunThroughConversation();
 
-	void RunThroughConversation(int32 NumberOfLinesToSpeak);
+	bool NotifyConversationHasEnded();
 
-	bool CheckIfBothAIFinishedTalking();
-
-	void CheckIfConversationHasEnded();
-
-	bool bHasConversationEnded = false;
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
 	AEnemyAIController* ControllerPatrolGuard1 = nullptr;
 	AEnemyAIController* ControllerPatrolGuard2 = nullptr;
@@ -49,8 +38,6 @@ protected:
 	TArray<USoundCue*> ConversationPatrolGuard1;
 	TArray<USoundCue*> ConversationPatrolGuard2;
 
-	void DebugDialog();
-
 	int32 PatrolGuardIDToTalk = 1;
 
 	bool PatrolGuard1ConversationReady = false;
@@ -59,10 +46,7 @@ protected:
 	bool PatrolGuard1HasLinesLeft = false;
 	bool PatrolGuard2HasLinesLeft = false;
 
+	bool bHasConversationEnded = false;
 
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 };

@@ -31,14 +31,6 @@ void UDialogComponent::BeginPlay()
 	
 }
 
-// Called every frame
-void UDialogComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
 USoundCue* UDialogComponent::GetRandSoundBasedOnTag(TArray<FDialogLine>Bank, FString Tag, int32 PlayerHeat)
 {
 	TArray<USoundCue*> ValidSounds;
@@ -69,7 +61,7 @@ bool UDialogComponent::PlayDialogLine(USoundCue* DialogLineAudio)
 		if (!AudioComponent->IsPlaying())
 		{
 			AudioComponent->Sound = DialogLineAudio;
-			AudioComponent->Play(0, 500, true, true);
+			AudioComponent->Play(0.f, ReportSoundRange, bReportSoundEnable, bDebugDraw);
 			bIsCurrentlyTalking = true;
 			return true;
 		}

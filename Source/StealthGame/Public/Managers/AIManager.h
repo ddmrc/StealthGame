@@ -21,21 +21,21 @@ public:
 
 	AEnemyCharacter* PatrolGuard1 = nullptr;
 	AEnemyCharacter* PatrolGuard2 = nullptr;
-	AEnemyCharacter* PatrolGuard3 = nullptr;
 
 	AEnemyAIController* ControllerPatrolGuard1 = nullptr;
 	AEnemyAIController* ControllerPatrolGuard2 = nullptr;
-	AEnemyAIController* ControllerPatrolGuard3 = nullptr;
 
 	ADialogManager* DialogManager = nullptr;
 
 	int32 LocalPlayerHeat;
+
 	int32 NumberOfLinesForConversation = 3;
+
 protected:
 
 	bool bDebugNeedsReset = false;
-
 	bool bConversationHasBeenSet = false;
+	bool bHasPlayerHeatBeenIncreased = false;
 
 	TSubclassOf<ADialogManager> MyItemBlueprint;
 
@@ -45,8 +45,6 @@ protected:
 	virtual void BeginPlay() override;
 	
 	void SetUpAIPointers();
-
-	void SetUpDialogManager();
 
 	bool CheckIfAnyAIWantsConversation();
 
@@ -59,8 +57,6 @@ protected:
 	void SpawnPatrolGuard(FVector Location,FRotator Rotation);
 
 	void UpdatePlayerHeat();
-
-	bool bHasPlayerHeatBeenIncreased = false;
 
 	bool MakeAIFaceEachOther();
 public:	

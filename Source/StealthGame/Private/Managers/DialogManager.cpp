@@ -4,80 +4,11 @@
 #include "Managers/DialogManager.h"
 #include "Kismet/GameplayStatics.h"
 
-static int32 GDialogOption = 0;
-
-static FAutoConsoleVariableRef CVarShowSoundEvents(
-	TEXT("Stealth.Debug.ConversationEvents"),
-	GDialogOption,
-	TEXT("0 = stop, 1 = Greeting, 2 = Inquire, 3 = Goodbye"),
-	ECVF_Cheat
-);
-
 
 // Sets default values
 ADialogManager::ADialogManager()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 
-}
-
-// Called when the game starts or when spawned
-void ADialogManager::BeginPlay()
-{
-	Super::BeginPlay();
-
-		GDialogOption = 0;
-	
-}
-
-// Called every frame
-void ADialogManager::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	DebugDialog();
-}
-
-void ADialogManager::DebugDialog()
-{
-
-	if (ControllerPatrolGuard1)
-	{
-		UDialogComponent* DialogComponent = ControllerPatrolGuard1->GetDialogComponent();
-
-
-		USoundCue* Line1 = DialogComponent->GetRandSoundBasedOnTag(DialogComponent->DefaultBank, "Greeting",ControllerPatrolGuard1->PlayerHeat);
-		USoundCue* Line2 = DialogComponent->GetRandSoundBasedOnTag(DialogComponent->DefaultBank, "Inquire", ControllerPatrolGuard1->PlayerHeat);
-		USoundCue* Line3 = DialogComponent->GetRandSoundBasedOnTag(DialogComponent->DefaultBank, "Goodbye", ControllerPatrolGuard1->PlayerHeat);
-		switch (GDialogOption)
-		{
-		case 0:
-			break;
-		case 1:
-			if (DialogComponent)
-			{
-				DialogComponent->PlayDialogLine(Line1);
-				GDialogOption = 0;
-			}
-			break;
-		case 2:
-			if (DialogComponent)
-			{
-				DialogComponent->PlayDialogLine(Line2);
-				GDialogOption = 0;
-			}
-			break;
-		case 3:
-			if (DialogComponent)
-			{
-				DialogComponent->PlayDialogLine(Line3);
-
-				GDialogOption = 0;
-			}
-			break;
-		}
-	}
 }
 
 void ADialogManager::SetUpAIPointerReference(AEnemyAIController* Controller, int32 PatrolGuardID)
@@ -95,44 +26,40 @@ void ADialogManager::SetUpAIPointerReference(AEnemyAIController* Controller, int
 	}
 }
 
-bool ADialogManager::CheckAIControllerReferenceByIndex(int32 PatrolGuardID)
-{
-	switch (PatrolGuardID)
-	{
-	case 1:
-		if (ControllerPatrolGuard1) { return true; }
-
-		break;
-	case 2:
-		if (ControllerPatrolGuard2) { return true; }
-		break;
-
-	}
-
-	return false;
-}
-
 void ADialogManager::SetUpConversationForController(int32 PatrolGuardID, int32 NumberOfLines, FString Topic)
 {
-	bHasConversationEnded = false;
 
-	if (NumberOfLines == 3 && Topic == "Default")
+	if (NumberOfLines == 3)
 	{
 		USoundCue* Line1;
 		USoundCue* Line2;
 		USoundCue* Line3;
+		
+		FString Line1Tag;
+		FString Line2Tag;
+		FString Line3Tag;
+
+		if (Topic == "Default")
+		{
+			Line1Tag = "Greeting";
+			Line2Tag = "Inquire";
+			Line3Tag = "Goodbye";
+		}
 
 		switch (PatrolGuardID)
 		{
 		case 1:
 			if (DialogComponentPatrolGuard1)
 			{
-				Line1 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Greeting", ControllerPatrolGuard1->PlayerHeat);
-				Line2 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Inquire", ControllerPatrolGuard1->PlayerHeat);
-				Line3 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag(DialogComponentPatrolGuard1->DefaultBank, "Goodbye", ControllerPatrolGuard1->PlayerHeat);
-			}
+				Line1 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag
+				(DialogComponentPatrolGuard1->DefaultBank, Line1Tag, ControllerPatrolGuard1->PlayerHeat);
 
-			ConversationPatrolGuard1.Empty();
+				Line2 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag
+				(DialogComponentPatrolGuard1->DefaultBank, Line2Tag, ControllerPatrolGuard1->PlayerHeat);
+
+				Line3 = DialogComponentPatrolGuard1->GetRandSoundBasedOnTag
+				(DialogComponentPatrolGuard1->DefaultBank, Line3Tag, ControllerPatrolGuard1->PlayerHeat);
+			}
 
 			ConversationPatrolGuard1.Add(Line1);
 			ConversationPatrolGuard1.Add(Line2);
@@ -144,12 +71,15 @@ void ADialogManager::SetUpConversationForController(int32 PatrolGuardID, int32 N
 		case 2:
 			if (DialogComponentPatrolGuard2)
 			{
-				Line1 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag(DialogComponentPatrolGuard2->DefaultBank, "Greeting", ControllerPatrolGuard2->PlayerHeat);
-				Line2 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag(DialogComponentPatrolGuard2->DefaultBank, "Inquire", ControllerPatrolGuard2->PlayerHeat);
-				Line3 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag(DialogComponentPatrolGuard2->DefaultBank, "Goodbye", ControllerPatrolGuard2->PlayerHeat);
-			}
+				Line1 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag
+				(DialogComponentPatrolGuard2->DefaultBank, Line1Tag, ControllerPatrolGuard2->PlayerHeat);
 
-			ConversationPatrolGuard2.Empty();
+				Line2 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag
+				(DialogComponentPatrolGuard2->DefaultBank, Line2Tag, ControllerPatrolGuard2->PlayerHeat);
+
+				Line3 = DialogComponentPatrolGuard2->GetRandSoundBasedOnTag
+				(DialogComponentPatrolGuard2->DefaultBank, Line3Tag, ControllerPatrolGuard2->PlayerHeat);
+			}
 
 			ConversationPatrolGuard2.Add(Line1);
 			ConversationPatrolGuard2.Add(Line2);
@@ -157,83 +87,6 @@ void ADialogManager::SetUpConversationForController(int32 PatrolGuardID, int32 N
 
 			PatrolGuard2HasLinesLeft = true;
 			break;
-		}
-	}
-
-}
-
-bool ADialogManager::GetIfAConversationIsReadyToStart()
-{
-	if (PatrolGuard1ConversationReady && PatrolGuard2ConversationReady)
-	{
-		return true;
-	}
-	return false;
-}
-
-void ADialogManager::RunThroughConversation(int32 NumberOfLinesToSpeak)
-{
-	if (NumberOfLinesToSpeak == 3)
-	{
-		if (ConversationPatrolGuard1.Num() > 0 && PatrolGuardIDToTalk == 1)
-		{
-			if (ConversationPatrolGuard1[0] != nullptr && !DialogComponentPatrolGuard2->GetIsCurrentlyTalking())
-			{
-				DialogComponentPatrolGuard1->PlayDialogLine(ConversationPatrolGuard1[0]);
-				ConversationPatrolGuard1[0] = nullptr;
-				PatrolGuardIDToTalk = 2;
-				ControllerPatrolGuard2->bIsTalking = false;
-				ControllerPatrolGuard1->bIsTalking = true;
-			}
-			else if (ConversationPatrolGuard1[1] != nullptr && !DialogComponentPatrolGuard2->GetIsCurrentlyTalking())
-			{
-				DialogComponentPatrolGuard1->PlayDialogLine(ConversationPatrolGuard1[1]);
-				ConversationPatrolGuard1[1] = nullptr;
-				PatrolGuardIDToTalk = 2;
-				ControllerPatrolGuard2->bIsTalking = false;
-				ControllerPatrolGuard1->bIsTalking = true;
-			}
-			else if (ConversationPatrolGuard1[2] != nullptr && !DialogComponentPatrolGuard2->GetIsCurrentlyTalking())
-			{
-				DialogComponentPatrolGuard1->PlayDialogLine(ConversationPatrolGuard1[2]);
-				ConversationPatrolGuard1[2] = nullptr;
-				PatrolGuardIDToTalk = 2;
-				PatrolGuard1HasLinesLeft = false;
-				ControllerPatrolGuard2->bIsTalking = false;
-				ControllerPatrolGuard1->bIsTalking = true;
-
-			}
-		}
-		else if (ConversationPatrolGuard2.Num() > 0 && PatrolGuardIDToTalk == 2)
-		{
-
-			if (ConversationPatrolGuard2[0] != nullptr && !DialogComponentPatrolGuard1->GetIsCurrentlyTalking())
-			{
-				DialogComponentPatrolGuard2->PlayDialogLine(ConversationPatrolGuard2[0]);
-				ConversationPatrolGuard2[0] = nullptr;
-				PatrolGuardIDToTalk = 1;
-				ControllerPatrolGuard1->bIsTalking = false;
-				ControllerPatrolGuard2->bIsTalking = true;
-			}
-			else if (ConversationPatrolGuard2[1] != nullptr && !DialogComponentPatrolGuard1->GetIsCurrentlyTalking())
-			{
-				DialogComponentPatrolGuard2->PlayDialogLine(ConversationPatrolGuard2[1]);
-				ConversationPatrolGuard2[1] = nullptr;
-				PatrolGuardIDToTalk = 1;
-				ControllerPatrolGuard1->bIsTalking = false;
-				ControllerPatrolGuard2->bIsTalking = true;
-			}
-			else if (ConversationPatrolGuard2[2] != nullptr && !DialogComponentPatrolGuard1->GetIsCurrentlyTalking())
-			{
-				DialogComponentPatrolGuard2->PlayDialogLine(ConversationPatrolGuard2[2]);
-				ConversationPatrolGuard2[2] = nullptr;
-				PatrolGuardIDToTalk = 1;
-
-				PatrolGuard2HasLinesLeft = false;
-				ControllerPatrolGuard1->bIsTalking = false;
-				ControllerPatrolGuard2->bIsTalking = true;
-
-			}
 		}
 	}
 
@@ -249,28 +102,62 @@ bool ADialogManager::HasAnyAIHaveConversationLeft()
 	return false;
 }
 
-bool ADialogManager::CheckIfBothAIFinishedTalking()
-{
-	if (!DialogComponentPatrolGuard1->GetIsCurrentlyTalking() && !DialogComponentPatrolGuard2->GetIsCurrentlyTalking())
-	{
-
-		return true;
-	}
-
-	return false;
-}
-
-void ADialogManager::CheckIfConversationHasEnded()
+void ADialogManager::RunThroughConversation()
 {
 
-	if (!PatrolGuard1HasLinesLeft && !PatrolGuard2HasLinesLeft && CheckIfBothAIFinishedTalking())
+	if (ConversationPatrolGuard1.Num() > 0 && PatrolGuardIDToTalk == 1 && !DialogComponentPatrolGuard2->GetIsCurrentlyTalking())
 	{
-		DialogComponentPatrolGuard1->bIsCurrentlyTalking = false;
-		DialogComponentPatrolGuard2->bIsCurrentlyTalking = false;
-		bHasConversationEnded = true;
+		DialogComponentPatrolGuard1->PlayDialogLine(ConversationPatrolGuard1[0]);
+
+		ConversationPatrolGuard1.RemoveAt(0,1, true);
+
+		if (ConversationPatrolGuard1.Num() == 0)
+		{
+			PatrolGuard1HasLinesLeft = false;
+		}
+
+		PatrolGuardIDToTalk = 2;
+
+		ControllerPatrolGuard2->bIsTalking = false;
+		ControllerPatrolGuard1->bIsTalking = true;
+
 	}
 
+	else if (ConversationPatrolGuard2.Num() > 0 && PatrolGuardIDToTalk == 2 && !DialogComponentPatrolGuard1->GetIsCurrentlyTalking())
+	{
+		DialogComponentPatrolGuard2->PlayDialogLine(ConversationPatrolGuard2[0]);
+
+		ConversationPatrolGuard2.RemoveAt(0, 1, true);
+
+		if (ConversationPatrolGuard2.Num() == 0)
+		{
+			PatrolGuard2HasLinesLeft = false;
+		}
+
+		PatrolGuardIDToTalk = 1;
+
+		ControllerPatrolGuard1->bIsTalking = false;
+		ControllerPatrolGuard2->bIsTalking = true;
+
+	}
+	
+
 }
+
+bool ADialogManager::NotifyConversationHasEnded() 
+{ 
+	if (!PatrolGuard1HasLinesLeft && !PatrolGuard2HasLinesLeft)
+	{
+		if (!DialogComponentPatrolGuard1->GetIsCurrentlyTalking() && !DialogComponentPatrolGuard2->GetIsCurrentlyTalking())
+		{
+			bHasConversationEnded = true;
+		}
+	}
+
+	return bHasConversationEnded; 
+}
+
+
 
 
 

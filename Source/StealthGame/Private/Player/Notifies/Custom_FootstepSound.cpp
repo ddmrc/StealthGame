@@ -29,8 +29,6 @@ void UCustom_FootstepSound::Notify(USkeletalMeshComponent* MeshComp, UAnimSequen
 		{
 			FVector SoundLocation = MeshComp->GetBoneLocation("pelvis", EBoneSpaces::WorldSpace);
 
-			//UGameplayStatics::PlaySoundAtLocation(MeshComp->GetWorld(), Sound, SoundLocation, VolumeMultiplier, 1.f, 0.f);
-			//UAISense_Hearing::ReportNoiseEvent(MeshComp->GetWorld(), SoundLocation, 1.f, MeshComp->GetOwner(), MaxSoundDistanceDetection * VolumeMultiplier);
 			CustomSoundWrapper::PlaySoundAtLocation(MeshComp->GetWorld(), Sound, SoundLocation, VolumeMultiplier, MeshComp->GetOwner(), MaxSoundDistanceDetection * VolumeMultiplier);
 
 		}
